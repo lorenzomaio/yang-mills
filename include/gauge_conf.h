@@ -314,7 +314,6 @@ void monopoles_obs(Gauge_Conf *GC,
                    Geometry const * const geo,
                    GParam const * const param,
                    int subg,
-                   double mod_poly,
                    FILE* monofilep);
 
 

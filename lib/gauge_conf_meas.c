@@ -903,12 +903,11 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                FILE *datafilep,
                                FILE *monofilep)
    {
-   double plaqs, plaqt, polyre, polyim, mod_poly;
+   double plaqs, plaqt, polyre, polyim;
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov(GC, geo, param, &polyre, &polyim);
 
-   mod_poly=NCOLOR*sqrt(pow(polyre, 2)+pow(polyim, 2)); // This is used to select in which of the two vacua the system is.
 
    fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
 
@@ -978,7 +977,7 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
         U1_extract(&helperconf, param, subg);
 
         // compute monopole observables
-        monopoles_obs(&helperconf, geo, param, subg, mod_poly, monofilep);
+        monopoles_obs(&helperconf, geo, param, subg, monofilep);
         }
 
      free_diag_proj_stuff(&helperconf, param);
@@ -1001,7 +1000,6 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
    {
    int i;
    double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1]; // +1 just to avoid warning if NCOLOR=1
-   double mod_poly;
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov_for_tracedef(GC, geo, param, polyre, polyim);
@@ -1057,7 +1055,7 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
    fflush(datafilep);
 
    // monopole observables
-   if(param->d_mon_meas == 1 && (mod_poly < 0.03 || mod_poly > 0.08))
+   if(param->d_mon_meas == 1)
      {
      #if(STDIM==4)
      Gauge_Conf helperconf;
@@ -1087,7 +1085,7 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
         U1_extract(&helperconf, param, subg);
 
         // compute monopole observables
-        monopoles_obs(&helperconf, geo, param, subg, mod_poly, monofilep);
+        monopoles_obs(&helperconf, geo, param, subg, monofilep);
         }
      free_diag_proj_stuff(&helperconf, param);
      free_gauge_conf(&helperconf, param);
@@ -1827,7 +1825,6 @@ void monopoles_obs(Gauge_Conf *GC,
                    Geometry const * const geo,
                    GParam const * const param, 
                    int subg,
-                   double mod_poly,
                    FILE* monofilep)
    {
    double mean_wrap;
@@ -1862,7 +1859,7 @@ void monopoles_obs(Gauge_Conf *GC,
            lexeo_to_cart(cartcoord, r_tback, param);
            if(n_mu == 1)
              {
-             fprintf(monofilep, "%ld %.12lg ", GC->update_index, mod_poly);
+             fprintf(monofilep, "%ld ", GC->update_index);
 
              for(int k = 0; k< 4; k++)
                 {
@@ -1872,7 +1869,7 @@ void monopoles_obs(Gauge_Conf *GC,
              }
            else if(GC->uflag[r_tback][0] == 1) // this is to print only once monopole of charge +2
                   {
-                  fprintf(monofilep, "%ld %.12lg ", GC->update_index, mod_poly);
+                  fprintf(monofilep, "%ld ", GC->update_index);
 
                   for(int k = 0; k<4; k++)
                      {
@@ -1899,7 +1896,7 @@ void monopoles_obs(Gauge_Conf *GC,
            lexeo_to_cart(cartcoord, r_tback, param);
            if(n_mu == -1)
              {
-             fprintf(monofilep, "%ld %.12lg ", GC->update_index, mod_poly);
+             fprintf(monofilep, "%ld ", GC->update_index);
 
              for(int k = 0; k<4; k++)
                 {
@@ -1909,7 +1906,7 @@ void monopoles_obs(Gauge_Conf *GC,
              }
            else if(GC->uflag[r][0] == -1)  // this is to print only once monopole of charge +2
                   {
-                  fprintf(monofilep, "%ld %.12lg ", GC->update_index, mod_poly);
+                  fprintf(monofilep, "%ld ", GC->update_index);
 
                   for(int k=0; k<4; k++)
                      {
