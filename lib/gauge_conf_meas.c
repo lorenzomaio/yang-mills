@@ -946,9 +946,9 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
    fflush(datafilep);
 
    // monopole observables
-   #if(STDIM==4)
    if(param->d_mon_meas == 1)
      {
+     #if STDIM==4
      int subg, subgnum;
      Gauge_Conf helperconf;
 
@@ -983,8 +983,10 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
      free_gauge_conf(&helperconf, param);
 
      fflush(monofilep);
+     #else
+     (void) monofilep;
+     #endif
      }
-   #endif
    }
 
 
@@ -1052,9 +1054,9 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
    fflush(datafilep);
 
    // monopole observables
-   #if(STDIM==4)
    if(param->d_mon_meas == 1)
      {
+     #if(STDIM==4)
      Gauge_Conf helperconf;
      int subg, subgnum;
 
@@ -1089,8 +1091,10 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
      free_gauge_conf(&helperconf, param);
 
      fflush(monofilep);
+     #else
+     (void) monofilep;
+     #endif
      }
-   #endif
    }
 
 
@@ -1410,6 +1414,66 @@ void perform_measures_higgs(Gauge_Conf *GC,
 
    fflush(datafilep);
    }
+
+
+// this is a function to be used just to test some fine points
+// most notably TrP^2=TrQ^2+1/NHIGGS
+void perform_measures_higgs_for_testing(Gauge_Conf *GC,
+                                        Geometry const * const geo,
+                                        GParam const * const param,
+                                        FILE *datafilep)
+   {
+   double plaqs, plaqt, polyre, polyim, he, p2, tildeG0, tildeGminp, tildeD0, tildeDminp;
+   long r;
+
+   plaquette(GC, geo, param, &plaqs, &plaqt);
+   polyakov(GC, geo, param, &polyre, &polyim);
+   higgs_interaction(GC, geo, param, &he);
+
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      init_FMatrix_vecs(&(GC->Qh[r]), &(GC->higgs[r]));
+      GC->Dh[r] = HiggsU1Obs_vecs(&(GC->higgs[r]));
+      }
+
+   fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+   fprintf(datafilep, "%.12g %.12g ", polyre, polyim);
+   fprintf(datafilep, "%.12g ", he);
+
+   compute_flavour_observables(GC,
+                               param,
+                               &tildeG0,
+                               &tildeGminp,
+                               &tildeD0,
+                               &tildeDminp);
+
+   fprintf(datafilep, "%.12g %.12g ", tildeG0, tildeGminp);
+   fprintf(datafilep, "%.12g %.12g ", tildeD0, tildeDminp);
+
+   p2=0.0;
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+: p2)
+   #endif
+   for(r=0; r<(param->d_volume); r++)
+      {
+      FMatrix tmp1, tmp2;
+      equal_FMatrix(&tmp1, &(GC->Qh[r]));
+      equal_FMatrix(&tmp2, &tmp1);
+      times_equal_FMatrix(&tmp1, &tmp2);
+      p2+=retr_FMatrix(&tmp1)*NHIGGS+1./NHIGGS;
+      }
+   p2*=param->d_inv_vol;
+
+   fprintf(datafilep, "%.12g ", p2);
+
+   fprintf(datafilep, "\n");
+
+   fflush(datafilep);
+   }
+
 
 
 // fix maximal abelian gauge
