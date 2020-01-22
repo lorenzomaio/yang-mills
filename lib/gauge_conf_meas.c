@@ -621,117 +621,6 @@ void polyakov_for_tracedef(Gauge_Conf const * const GC,
    }
 
 
-// compute the mean Polyakov loop and its powers (trace of) in the presence of trace deformation in direction dir
-void polyakov_tracedef_in_direction_dir(Gauge_Conf const * const GC,
-                                        Geometry const * const geo,
-                                        GParam const * const param,
-                                        int dir,
-                                        double *repoly,
-                                        double *impoly)
-   {
-   long r;
-   double **rep, **imp;
-   int j, err;
-   long i;
-
-   for(j=0;j<(int)floor(NCOLOR/2);j++)
-      {
-      repoly[j]=0.0;
-      impoly[j]=0.0;
-      }
-
-   err=posix_memalign((void**)&rep, (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double*));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   err=posix_memalign((void**)&imp, (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double*));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-
-   for(i=0; i<param->d_volume; i++)
-      {
-      err=posix_memalign((void**)&(rep[i]), (size_t)DOUBLE_ALIGN, (size_t) (int)floor(NCOLOR/2) * sizeof(double));
-      if(err!=0)
-        {
-        fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-        exit(EXIT_FAILURE);
-        }
-      err=posix_memalign((void**)&(imp[i]), (size_t)DOUBLE_ALIGN, (size_t) (int)floor(NCOLOR/2) * sizeof(double));
-      if(err!=0)
-        {
-        fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-        exit(EXIT_FAILURE);
-        }
-      }
-
-   for(i=0; i<param->d_volume; i++)
-      {
-      for(j=0; j<(int)floor(NCOLOR/2); j++)
-         {
-         rep[i][j] = 0.0;
-         imp[i][j] = 0.0;
-         }
-      }
-
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(rsp)
-   #endif
-   for(r=0; r<param->d_volume; r++)
-      {
-      int k;
-      GAUGE_GROUP matrix, matrix2;
-
-      one(&matrix);
-      for(k=0; k<param->d_size[dir]; k++)
-         {
-         times_equal(&matrix, &(GC->lattice[r][dir]));
-         r=nnp(geo, r, dir);
-
-         }
-
-
-       rep[r][0] = retr(&matrix);
-       imp[r][0] = imtr(&matrix);
-
-       equal(&matrix2, &matrix);
-
-      for(k=1; k<(int)floor(NCOLOR/2.0); k++)
-         {
-         times_equal(&matrix2, &matrix);
-         rep[r][k] = retr(&matrix2);
-         imp[r][k] = imtr(&matrix2);
-         }
-      }
-
-    for(j=0; j<(int)floor(NCOLOR/2); j++)
-       {
-       for(i=0; i<param->d_volume; i++)
-          {
-          repoly[j] += rep[i][j];
-          impoly[j] += imp[i][j];
-          }
-       }
-
-   for(j=0; j<(int)floor(NCOLOR/2.0); j++)
-      {
-      repoly[j] *= (param->d_size[dir]*param->d_inv_vol);
-      impoly[j] *= (param->d_size[dir]*param->d_inv_vol);
-      }
-
-   for(i=0; i<param->d_space_vol; i++)
-      {
-      free(rep[i]);
-      free(imp[i]);
-      }
-   free(rep);
-   free(imp);
-   }
-
 // compute the local topological charge at point r
 // see readme for more details
 double loc_topcharge(Gauge_Conf const * const GC,
@@ -1004,13 +893,6 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov_for_tracedef(GC, geo, param, polyre, polyim);
    fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
-
-   for(i=0; i<(int)floor(NCOLOR/2); i++)
-      {
-      fprintf(datafilep, "%.12g %.12g ", polyre[i], polyim[i]);
-      }
-
-   polyakov_tracedef_in_direction_dir(GC, geo, param, 1, polyre, polyim);
 
    for(i=0; i<(int)floor(NCOLOR/2); i++)
       {
