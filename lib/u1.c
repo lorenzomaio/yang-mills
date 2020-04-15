@@ -103,11 +103,11 @@ void times_U1(U1 *A, U1 const * const B, U1 const * const C);
 
 
 // A=lambda*B with lambda diagonal matrix
-void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * const restrict B);
+void diag_matrix_times_U1(U1 * restrict A, double const lambda[1], U1 const * const restrict B);
 
 
 // A=lambda*B^{dag} with lambda diagonal matrix
-void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const * const restrict B);
+void diag_matrix_times_dag_U1(U1 * restrict A, double const lambda[1], U1 const * const restrict B);
 
 
 // A=B^{dag}*C
@@ -410,6 +410,10 @@ void plus_equal_U1Vecs(U1Vecs * restrict A, U1Vecs const * const restrict B);
 
 // *= with real number
 void times_equal_real_U1Vecs(U1Vecs * restrict A, double r);
+
+
+// *= with real for a single component
+void times_equal_real_single_U1Vecs(U1Vecs * restrict A, double r, int j);
 
 
 // *= with complex number for a single component

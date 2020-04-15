@@ -203,8 +203,8 @@ inline void minus_equal_dag_U1(U1 * restrict A, U1 const * const restrict B)
 
 // A=b*B+c*C
 inline void lin_comb_U1(U1 * restrict A,
-                 double b, U1 const * const restrict B,
-                 double c, U1 const * const restrict C)
+                        double b, U1 const * const restrict B,
+                        double c, U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -226,8 +226,8 @@ inline void lin_comb_U1(U1 * restrict A,
 
 // A=b*B^{dag}+c*C
 inline void lin_comb_dag1_U1(U1 * restrict A,
-                      double b, U1 const * const restrict B,
-                      double c, U1 const * const restrict C)
+                             double b, U1 const * const restrict B,
+                             double c, U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -249,8 +249,8 @@ inline void lin_comb_dag1_U1(U1 * restrict A,
 
 // A=b*B+c*C^{dag}
 inline void lin_comb_dag2_U1(U1 * restrict A,
-                      double b, U1 const * const restrict B,
-                      double c, U1 const * const restrict C)
+                             double b, U1 const * const restrict B,
+                             double c, U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -272,8 +272,8 @@ inline void lin_comb_dag2_U1(U1 * restrict A,
 
 // A=b*B^{dag}+c*C^{dag}
 inline void lin_comb_dag12_U1(U1 * restrict A,
-                       double b, U1 const * const restrict B,
-                       double c, U1 const * const restrict C)
+                              double b, U1 const * const restrict B,
+                              double c, U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -379,7 +379,7 @@ inline void times_U1(U1 * restrict A,
 
 
 // A=lambda*B with lambda diagonal matrix
-inline void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * const restrict B)
+inline void diag_matrix_times_U1(U1 * restrict A, double const lambda[1], U1 const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -394,12 +394,12 @@ inline void diag_matrix_times_U1(U1 * restrict A, double *lambda, U1 const * con
   __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
-  A->comp= B->comp * (*lambda);
+  A->comp= B->comp * (lambda[0]);
   }
 
 
 // A=lambda*B^{dag} with lambda diagonal matrix
-inline void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const * const restrict B)
+inline void diag_matrix_times_dag_U1(U1 * restrict A, double const lambda[1], U1 const * const restrict B)
   {
   #ifdef DEBUG
   if(A==B)
@@ -414,14 +414,14 @@ inline void diag_matrix_times_dag_U1(U1 * restrict A, double *lambda, U1 const *
   __assume_aligned(&(B->comp), DOUBLE_ALIGN);
   #endif
 
-  A->comp= conj(B->comp) * (*lambda);
+  A->comp= conj(B->comp) * (lambda[0]);
   }
 
 
 // A=B^{dag}*C
 inline void times_dag1_U1(U1 * restrict A,
-                   U1 const * const restrict B,
-                   U1 const * const restrict C)
+                          U1 const * const restrict B,
+                          U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -443,8 +443,8 @@ inline void times_dag1_U1(U1 * restrict A,
 
 // A=B*C^{dag}
 inline void times_dag2_U1(U1 * restrict A,
-                   U1 const * const restrict B,
-                   U1 const * const restrict C)
+                          U1 const * const restrict B,
+                          U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -466,8 +466,8 @@ inline void times_dag2_U1(U1 * restrict A,
 
 // A=B^{dag}*C^{dag}
 inline void times_dag12_U1(U1 * restrict A,
-                    U1 const * const restrict B,
-                    U1 const * const restrict C)
+                           U1 const * const restrict B,
+                           U1 const * const restrict C)
   {
   #ifdef DEBUG
   if(A==B || A==C || B==C)
@@ -615,11 +615,11 @@ inline void TensProd_init_U1(TensProd * restrict TP, U1 const * const restrict A
 // convert the fundamental representation matrix B to the adjoint representation matrix A
 inline void fund_to_adj_U1(U1Adj * restrict A, U1 const * const restrict B)
   {
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
   (void) A;
   (void) B;
-
-  fprintf(stderr, "The function fund_to_adj_U1 still has to be written (%s, %d)\n", __FILE__, __LINE__);
-  exit(EXIT_FAILURE);
   }
 
 
@@ -627,12 +627,12 @@ inline void fund_to_adj_U1(U1Adj * restrict A, U1 const * const restrict B)
 // using two matrices in the fundamental representation
 inline void TensProdAdj_init_U1(TensProdAdj * restrict TP, U1 const * const restrict A1, U1 const * const restrict A2)
   {
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
   (void) TP;
   (void) A1;
   (void) A2;
-
-  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
-  exit(EXIT_FAILURE);
   }
 
 
@@ -640,54 +640,63 @@ inline void TensProdAdj_init_U1(TensProdAdj * restrict TP, U1 const * const rest
 // using two matrices in the adjoint representation
 inline void TensProdAdj_init_U1Adj(TensProdAdj * restrict TP, U1Adj const * const restrict A1, U1Adj const * const restrict A2)
   {
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
   (void) TP;
   (void) A1;
   (void) A2;
-
-  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
-  exit(EXIT_FAILURE);
   }
 
 
 // A=1
 inline void zero_U1Adj(U1Adj * restrict A)
   {
-  A->comp=1.0;
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
+  (void) A;
   }
 
 
 // A=0
 inline void one_U1Adj(U1Adj * restrict A)
   {
-  A->comp=0.0;
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
+  (void) A;
   }
 
 
 // A+=B
 inline void plus_equal_U1Adj(U1Adj * restrict A, U1Adj const * const restrict B)
   {
-  #ifdef DEBUG
-  if(A==B)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
 
-  A->comp += B->comp;
+  (void) A;
+  (void) B;
   }
 
 
 // A*=r
 inline void times_equal_real_U1Adj(U1Adj * restrict A, double r)
   {
-  A->comp *=r;
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
+  (void) A;
+  (void) r;
   }
 
 
 // A*=B
 inline void times_equal_U1Adj(U1Adj * restrict A, U1Adj const * const restrict B)
   {
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
   (void) A;
   (void) B;
   }
@@ -696,6 +705,9 @@ inline void times_equal_U1Adj(U1Adj * restrict A, U1Adj const * const restrict B
 // trace in the adjoint rep.
 inline double retr_U1Adj(U1Adj * restrict A)
   {
+  fprintf(stderr, "U(1) has no adjoint representation! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+
   (void) A;
   return 0.0;
   }
@@ -819,6 +831,17 @@ inline void times_equal_real_U1Vecs(U1Vecs * restrict A, double r)
   }
 
 
+// *= with real for a single component
+inline void times_equal_real_single_U1Vecs(U1Vecs * restrict A, double r, int j)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  A->comp[j]*=r;
+  }
+
+
 // *= with complex number for a single component
 inline void times_equal_complex_single_U1Vecs(U1Vecs * restrict A, double complex r, int j)
   {
@@ -828,6 +851,7 @@ inline void times_equal_complex_single_U1Vecs(U1Vecs * restrict A, double comple
 
   A->comp[j]*=r;
   }
+
 
 // norm
 inline double norm_U1Vecs(U1Vecs const * const restrict A)
@@ -904,7 +928,10 @@ inline double re_scal_prod_single_U1Vecs(U1Vecs const * const restrict v1, U1Vec
 
 // the i-th component of v2 is multiplied by "matrix"
 // v1=matrix*v2
-inline void matrix_times_vector_single_U1Vecs(U1Vecs * restrict v1, U1 const * const restrict matrix, U1Vecs const * const restrict v2, int i)
+inline void matrix_times_vector_single_U1Vecs(U1Vecs * restrict v1,
+                                              U1 const * const restrict matrix,
+                                              U1Vecs const * const restrict v2,
+                                              int i)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
@@ -920,7 +947,9 @@ inline void matrix_times_vector_single_U1Vecs(U1Vecs * restrict v1, U1 const * c
 
 // all the components of v2 are multiplied by "matrix"
 // v1=matrix*v2
-inline void matrix_times_vector_all_U1Vecs(U1Vecs * restrict v1, U1 const * const restrict matrix, U1Vecs const * const restrict v2)
+inline void matrix_times_vector_all_U1Vecs(U1Vecs * restrict v1,
+                                           U1 const * const restrict matrix,
+                                           U1Vecs const * const restrict v2)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
@@ -939,7 +968,9 @@ inline void matrix_times_vector_all_U1Vecs(U1Vecs * restrict v1, U1 const * cons
 
 // tensor product of two vectors
 // Re(v1^{\dag} * aux * v2) = ReTr(aux * matrix)
-inline void vector_tensor_vector_U1Vecs(U1 * restrict matrix, U1Vecs const * const restrict v1, U1Vecs const * const restrict v2)
+inline void vector_tensor_vector_U1Vecs(U1 * restrict matrix,
+                                        U1Vecs const * const restrict v1,
+                                        U1Vecs const * const restrict v2)
   {
   #ifdef __INTEL_COMPILER
   __assume_aligned(&(matrix->comp), DOUBLE_ALIGN);

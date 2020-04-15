@@ -1549,9 +1549,16 @@ void heatbath_with_higgs(Gauge_Conf *GC,
     zero(&stap1);
     }
 
-  vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
-  times_equal_real(&stap2, param->d_higgs_beta*NHIGGS*NCOLOR); // NCOLOR is needed to compensate the
-                                                               // 1/NCOLOR that is present in the gauge part
+  if(fabs(param->d_higgs_beta)>MIN_VALUE)
+    {
+    vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
+    times_equal_real(&stap2, param->d_higgs_beta*NHIGGS*NCOLOR); // NCOLOR is needed to compensate the
+                                                                 // 1/NCOLOR that is present in the gauge part
+    }
+  else
+    {
+    zero(&stap2);
+    }
 
   plus_equal(&stap1, &stap2);
 
@@ -1591,9 +1598,16 @@ void overrelaxation_with_higgs(Gauge_Conf *GC,
     zero(&stap1);
     }
 
-  vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
-  times_equal_real(&stap2, param->d_higgs_beta*NHIGGS*NCOLOR); // NCOLOR is needed to compensate the
-                                                               // 1/NCOLOR that is present in the gauge part
+  if(fabs(param->d_higgs_beta)>MIN_VALUE)
+    {
+    vector_tensor_vector_vecs(&stap2, &(GC->higgs[r]), &(GC->higgs[nnp(geo, r, i)]));
+    times_equal_real(&stap2, param->d_higgs_beta*NHIGGS*NCOLOR); // NCOLOR is needed to compensate the
+                                                                 // 1/NCOLOR that is present in the gauge part
+    }
+  else
+    {
+    zero(&stap2);
+    }
 
   plus_equal(&stap1, &stap2);
 
@@ -1693,7 +1707,7 @@ int metropolis_for_higgs(Gauge_Conf *GC,
      {
      old_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&(GC->higgs[r]), &staple);
 
-     j=(int)(NHIGGS*casuale() - MIN_VALUE);
+     j=(int)(NHIGGS*casuale()*(1.0 - MIN_VALUE));
 
      rand_matrix(&matrix);
      times_equal_real(&matrix, param->d_epsilon_metro);
@@ -1703,13 +1717,11 @@ int metropolis_for_higgs(Gauge_Conf *GC,
        {
        equal(&rnd_matrix, &matrix);
        matrix_times_vector_single_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
-       times_equal_complex_single_vecs(&new_vector, cexp(I*param->d_epsilon_metro*PI*casuale()),j);
        }
      else
        {
        equal_dag(&rnd_matrix, &matrix);
        matrix_times_vector_single_vecs(&new_vector, &rnd_matrix, &(GC->higgs[r]), j);
-       times_equal_complex_single_vecs(&new_vector, cexp(-I*param->d_epsilon_metro*PI*casuale()),j);
        }
 
      new_energy=-NHIGGS*param->d_higgs_beta*re_scal_prod_vecs(&new_vector, &staple);

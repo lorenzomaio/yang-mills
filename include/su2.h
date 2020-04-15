@@ -473,63 +473,31 @@ inline void times_Su2(Su2 * restrict A,
 
 // A=lambda*B with lambda diagonal matrix
 inline void diag_matrix_times_Su2(Su2 * restrict A, 
-                                  double *lambda, 
+                                  double const lambda[2],
                                   Su2 const * const restrict B)
   {
-  #ifdef DEBUG
-  if(A==B)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
+  fprintf(stderr, "The function diag_matrix_times_Su2 cannot be defined using the Pauli representation of SU(2) ");
+  fprintf(stderr, "(%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
 
-  #ifdef __INTEL_COMPILER
-  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
-  __assume_aligned(&(B->comp), DOUBLE_ALIGN);
-  #endif
-  
-  // lambda is written in the form lambda = a*1 +ib*sigma with a=(lambda[1]+lambda[2])/2 e b=(lambda[1]-lambda[2])/2
-  double a,b;
-  
-  a = (double) (lambda[1] + lambda[2])/2;
-  b = (double) (lambda[1] - lambda[2])/2;
-
-  A->comp[0]= B->comp[0]*a - B->comp[3]*b;
-  A->comp[1]= a*B->comp[1] + b*B->comp[2];
-  A->comp[2]= B->comp[2]*a - b*B->comp[1];
-  A->comp[3]= a*B->comp[3] + B->comp[0]*b;
+  (void) A;
+  (void) lambda;
+  (void) B;
   }
 
 
 // A=lambda*B^{dag} with lambda diagonal matrix
 inline void diag_matrix_times_dag_Su2(Su2 * restrict A,
-                                      double *lambda,
+                                      double const lambda[2],
                                       Su2 const * const restrict B)
   {
-  #ifdef DEBUG
-  if(A==B)
-    {
-    fprintf(stderr, "The same pointer is used twice in (%s, %d)\n", __FILE__, __LINE__);
-    exit(EXIT_FAILURE);
-    }
-  #endif
+  fprintf(stderr, "The function diag_matrix_times_dag_Su2 cannot be defined using the Pauli representation of SU(2) ");
+  fprintf(stderr, "(%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
 
-  #ifdef __INTEL_COMPILER
-    __assume_aligned(&(A->comp), DOUBLE_ALIGN);
-    __assume_aligned(&(B->comp), DOUBLE_ALIGN);
-  #endif
- 
-  // lambda is written in the form lambda = a*1 +ib*sigma with a=(lambda[1]+lambda[2])/2 e b=(lambda[1]-lambda[2])/2
-  double a,b;
-  
-  a = (double) (lambda[1] + lambda[2])/2;
-  b = (double) (lambda[1] - lambda[2])/2;
-
-  A->comp[0]=  B->comp[0]*a + B->comp[3]*b;
-  A->comp[1]=  B->comp[1]*a + B->comp[2]*b;
-  A->comp[2]=  B->comp[2]*a - B->comp[1]*b;
-  A->comp[3]= -B->comp[0]*b + B->comp[3]*a;
+  (void) A;
+  (void) lambda;
+  (void) B;
   }
 
 
@@ -1153,6 +1121,20 @@ inline void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r)
      {
      A->comp[i]*=r;
      }
+  }
+
+
+// *= with real for a single component
+inline void times_equal_real_single_Su2Vecs(Su2Vecs * restrict A, double r, int j)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  A->comp[4*j+0]*=r;
+  A->comp[4*j+1]*=r;
+  A->comp[4*j+2]*=r;
+  A->comp[4*j+3]*=r;
   }
 
 

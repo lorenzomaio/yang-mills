@@ -1,5 +1,5 @@
-#ifndef YM_TUBEADJ_DISC_C
-#define YM_TUBEADJ_DISC_C
+#ifndef YM_POLYCORR_HIGGS_LONG_C
+#define YM_POLYCORR_HIGGS_LONG_C
 
 #include"../include/macro.h"
 
@@ -25,6 +25,7 @@ void real_main(char *in_file)
     GParam param;
 
     int count;
+    double acc, acc_local;
     FILE *datafilep;
     time_t time1, time2;
 
@@ -41,7 +42,7 @@ void real_main(char *in_file)
        {
        if(tmp!= param.d_size[count])
          {
-         fprintf(stderr, "When using yang_mills_tubeadj_disc all the spatial sizes have to be of equal length.\n");
+         fprintf(stderr, "When using yang_mills_polycorr_higgs_long all the spatial sizes have to be of equal length.\n");
          exit(EXIT_FAILURE);
          }
        }
@@ -58,35 +59,84 @@ void real_main(char *in_file)
 
     // initialize gauge configuration
     init_gauge_conf(&GC, &param);
+    init_higgs_conf(&GC, &param);
 
-    // allocate ml_polycorr and ml_polyplaq arrays
-    alloc_tubeadj_disc_stuff(&GC, &param);
+    // initialize ml_polycorr arrays
+    alloc_polycorr_stuff(&GC, &param);
 
-    // montecarlo
+    // acceptance of the metropolis update
+    acc=0.0;
+
+    // montecarlo starts
     time(&time1);
-    // count starts from 1 to avoid problems using %
-    for(count=1; count < param.d_sample + 1; count++)
-       {
-       update(&GC, &geo, &param);
-
-       if(count % param.d_measevery ==0 && count >= param.d_thermal)
+    if(param.d_start != 2) // NEW SIMULATION
+      {
+      for(count=0; count<param.d_measevery; count++)
          {
-         perform_measures_tubeadj_disc(&GC, &geo, &param, datafilep);
+         update_with_higgs(&GC, &geo, &param, &acc_local);
          }
 
-       // save configuration for backup
-       if(param.d_saveconf_back_every!=0)
-         {
-         if(count % param.d_saveconf_back_every == 0 )
+      if(count>param.d_thermal)
+        {
+        acc+=acc_local;
+        }
+
+      // save configuration
+      write_conf_on_file(&GC, &param);
+      write_higgs_on_file(&GC, &param);
+
+      // backup copy
+      write_conf_on_file_back(&GC, &param);
+      write_higgs_on_file_back(&GC, &param);
+
+      // save ml polycorr arrays
+      write_polycorr_on_file(&GC, &param, 0);
+      }
+    else // CONTINUATION OF PREVIOUS SIMULATION
+      {
+      int count, iteration;
+
+      // read multilevel stuff
+      read_polycorr_from_file(&GC, &param, &iteration);
+
+      if(iteration<0) // update the conf, no multilevel
+        {
+        for(count=0; count<param.d_measevery; count++)
            {
-           // simple
-           write_conf_on_file(&GC, &param);
-
-           // backup copy
-           write_conf_on_file_back(&GC, &param);
+           update_with_higgs(&GC, &geo, &param, &acc_local);
            }
-         }
-       }
+
+        // save configuration
+        write_conf_on_file(&GC, &param);
+        write_higgs_on_file(&GC, &param);
+
+        // backup copy
+        write_conf_on_file_back(&GC, &param);
+        write_higgs_on_file(&GC, &param);
+
+        // save multilevel stuff
+        write_polycorr_on_file(&GC, &param, 0);
+        }
+      else // iteration >=0, perform multilevel
+        {
+        multilevel_polycorr_long_with_higgs(&GC,
+                                            &geo,
+                                            &param,
+                                            param.d_ml_step[0],
+                                            iteration);
+        iteration+=1;
+        if(iteration==param.d_ml_level0_repeat)
+          {
+          // print the measure
+          perform_measures_polycorr_long(&GC, &param, datafilep);
+
+          iteration=-1; // next time the conf will be updated, no multilevel
+          }
+
+        // save multilevel stuff
+        write_polycorr_on_file(&GC, &param, iteration);
+        }
+      }
     time(&time2);
     // montecarlo end
 
@@ -97,16 +147,18 @@ void real_main(char *in_file)
     if(param.d_saveconf_back_every!=0)
       {
       write_conf_on_file(&GC, &param);
+      write_higgs_on_file(&GC, &param);
       }
 
     // print simulation details
-    print_parameters_tube_disc(&param, time1, time2);
+    print_parameters_polycorr_higgs_long(&param, time1, time2, acc);
 
     // free gauge configuration
     free_gauge_conf(&GC, &param);
+    free_higgs_conf(&GC);
 
-    // free ml_polycorr and ml_polyplaq
-    free_tubeadj_disc_stuff(&GC, &param);
+    // free ml_polycorr
+    free_polycorr_stuff(&GC, &param);
 
     // free geometry
     free_geometry(&geo, &param);
@@ -129,28 +181,29 @@ void print_template_input(void)
     fprintf(fp, "size 4 4 4 4\n");
     fprintf(fp,"\n");
     fprintf(fp, "beta 5.705\n");
+    fprintf(fp, "higgs_beta 1.5\n");
     fprintf(fp, "theta 1.5\n");
     fprintf(fp,"\n");
-    fprintf(fp, "sample    10\n");
-    fprintf(fp, "thermal   0\n");
     fprintf(fp, "overrelax 5\n");
     fprintf(fp, "measevery 1\n");
     fprintf(fp,"\n");
     fprintf(fp, "start                   0  # 0=ordered  1=random  2=from saved configuration\n");
-    fprintf(fp, "saveconf_back_every     5  # if 0 does not save, else save backup configurations every ... updates\n");
     fprintf(fp,"\n");
     fprintf(fp, "#for multilevel\n");
     fprintf(fp, "multihit         10  # number of multihit step\n");
     fprintf(fp, "ml_step          2   # timeslices for multilevel (from largest to smallest)\n");
     fprintf(fp, "ml_upd           10  # number of updates for various levels\n");
+    fprintf(fp, "ml_level0_repeat 1   # number of times level0 is repeated in long sim.\n");
     fprintf(fp, "dist_poly        2   # distance between the polyakov loop\n");
-    fprintf(fp, "transv_dist      2   # transverse distance from the polyakov correlator\n");
-    fprintf(fp, "plaq_dir         1 0 # plaquette orientation for flux tube\n");
+    fprintf(fp,"\n");
+    fprintf(fp, "epsilon_metro    0.25      #distance from the identity of the random matrix for metropolis\n");
     fprintf(fp,"\n");
     fprintf(fp, "#output files\n");
     fprintf(fp, "conf_file  conf.dat\n");
+    fprintf(fp, "higgs_conf_file  higgs_conf.dat\n");
     fprintf(fp, "data_file  dati.dat\n");
     fprintf(fp, "log_file   log.dat\n");
+    fprintf(fp, "ml_file    ml.dat\n");
     fprintf(fp, "\n");
     fprintf(fp, "randseed 0    #(0=time)\n");
     fclose(fp);
@@ -171,6 +224,7 @@ int main (int argc, char **argv)
       printf("Compilation details:\n");
       printf("\tGGROUP: %s\n", QUOTEME(GGROUP));
       printf("\tN_c (number of colors): %d\n", NCOLOR);
+      printf("\tN_higgs (number of higgs flavours): %d\n", NHIGGS);
       printf("\tST_dim (space-time dimensionality): %d\n", STDIM);
       printf("\tNum_levels (number of levels): %d\n", NLEVELS);
       printf("\n");
@@ -189,6 +243,9 @@ int main (int argc, char **argv)
         printf("\n\tusing imaginary theta\n");
       #endif
 
+      #ifdef OPT_MULTILEVEL
+        printf("\tcompiled for multilevel optimization\n");
+      #endif
 
       printf("\n");
 

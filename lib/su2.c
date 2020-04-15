@@ -103,10 +103,10 @@ void times_Su2(Su2 *A, Su2 const * const B, Su2 const * const C);
 
 
 // A = lambda*B with lambda diagonal marix
-void diag_matrix_times_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
+void diag_matrix_times_Su2(Su2 * restrict A, double const lambda[2], Su2 const * const restrict B);
 
 // A=lambda*B^{dag} with lambda diagonal matrix
-void diag_matrix_times_dag_Su2(Su2 * restrict A, double *lambda, Su2 const * const restrict B);
+void diag_matrix_times_dag_Su2(Su2 * restrict A, double const lambda[2], Su2 const * const restrict B);
 
 
 // A=B^{dag}*C
@@ -458,6 +458,10 @@ void plus_equal_Su2Vecs(Su2Vecs * restrict A, Su2Vecs const * const restrict B);
 
 // *= with real number
 void times_equal_real_Su2Vecs(Su2Vecs * restrict A, double r);
+
+
+// *= with real for a single component
+void times_equal_real_single_Su2Vecs(Su2Vecs * restrict A, double r, int j);
 
 
 // *= with complex number for a single component

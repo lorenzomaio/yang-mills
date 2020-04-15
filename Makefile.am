@@ -1,5 +1,6 @@
 bin_PROGRAMS = conf_check \
                debug_rng \
+               debug_son \
                debug_su2 \
                debug_su2_adj \
                debug_su2sun \
@@ -11,6 +12,8 @@ bin_PROGRAMS = conf_check \
                yang_mills_local_fundadj \
                yang_mills_polycorr \
                yang_mills_polycorr_long \
+               yang_mills_polycorr_higgs \
+               yang_mills_polycorr_higgs_long \
                yang_mills_polycorradj \
                yang_mills_polycorradj_long \
                yang_mills_t0 \
@@ -62,25 +65,30 @@ geometry = ./include/geometry.h \
 gparam = ./include/gparam.h \
          ./lib/gparam.c
 
+son = ./include/son.h \
+      ./include/son_monopoles.h \
+      ./include/son_upd.h \
+      ./lib/son.c \
+      ./lib/son_monopoles.c \
+      ./lib/son_upd.c
+
 random = ./include/myrngparam.h \
          ./include/random.h \
          ./lib/random.c 
 
 su2 = ./include/su2.h \
-      ./include/su2_upd.h \
       ./include/su2_monopoles.h \
+      ./include/su2_upd.h \
       ./lib/su2.c \
-      ./lib/su2_upd.c \
-      ./lib/su2_monopoles.c 
+      ./lib/su2_monopoles.c \
+      ./lib/su2_upd.c
 
-sun = ./include/sun_aux.h \
-      ./include/sun.h \
-      ./include/sun_upd.h \
+sun = ./include/sun.h \
       ./include/sun_monopoles.h \
-      ./lib/sun_aux.c \
+      ./include/sun_upd.h \
       ./lib/sun.c \
-      ./lib/sun_upd.c \
-      ./lib/sun_monopoles.c
+      ./lib/sun_monopoles.c \
+      ./lib/sun_upd.c 
 
 tens_prod = ./include/tens_prod.h \
             ./include/tens_prod_adj.h \
@@ -103,6 +111,7 @@ everything =  $(align) \
               $(geometry) \
               $(gparam) \
               ./include/macro.h \
+              $(son) \
               $(random) \
               $(su2) \
               $(sun) \
@@ -117,6 +126,7 @@ conf_check_SOURCES=./src/conf_check.c \
                    $(funcpoint) \
                    $(gparam) \
                    $(random) \
+                   $(son) \
                    $(su2) \
                    $(sun) \
                    $(tens_prod) \
@@ -126,6 +136,16 @@ debug_rng_SOURCES=./src/debug_rng.c \
                   $(align) \
                   $(dSFMT) \
                   $(random)
+
+debug_son_SOURCES=./src/debug_son.c \
+                  $(align) \
+                  $(dSFMT) \
+                  $(endian) \
+                  $(flavourmatrix) \
+                  ./include/macro.h \
+                  $(random) \
+                  $(son) \
+                  $(tens_prod) 
 
 debug_su2_SOURCES=./src/debug_su2.c \
                   $(align) \
@@ -188,6 +208,7 @@ debug_vecs_SOURCES=./src/debug_vecs.c \
                    $(gparam) \
                    ./include/macro.h \
                    $(random) \
+                   $(son) \
                    $(su2) \
                    $(sun) \
                    $(tens_prod) \
@@ -207,6 +228,12 @@ yang_mills_polycorr_SOURCES=./src/yang_mills_polycorr.c \
 
 yang_mills_polycorr_long_SOURCES=./src/yang_mills_polycorr_long.c \
                                  $(everything)
+
+yang_mills_polycorr_higgs_SOURCES=./src/yang_mills_polycorr_higgs.c \
+                                  $(everything)
+
+yang_mills_polycorr_higgs_long_SOURCES=./src/yang_mills_polycorr_higgs_long.c \
+                                  $(everything)
 
 yang_mills_polycorradj_SOURCES=./src/yang_mills_polycorradj.c \
                                $(everything)

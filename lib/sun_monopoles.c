@@ -15,21 +15,19 @@
 #include"../include/sun_monopoles.h"
 #include"../include/su2_monopoles.h"
 #include"../include/sun.h"
-#include"../include/sun_aux.h"
-
 
 // This function compute the MAG gauge transformation in the SU(N) case
 void comp_MAG_gauge_transformation_SuN(SuN X_links[2*STDIM],
-                                       double lambda[NCOLOR],
-                                       double OverRelaxParam,
+                                       double const lambda[NCOLOR],
+                                       double overrelaxparam,
                                        SuN *G_mag)
 
    {
-   int i, j, dir;
-   double vec_x[3];
-   double X_mod;
-   SuN X, aux1, aux2, aux3, aux_g;
-   Su2 G_mag_su2;   
+   int i, j, dir, k;
+   double vec_x[3], X_mod;
+   complex double gii, gij, gji, gjj, tmp0, tmp1;
+   SuN X, aux1, aux2, aux3;
+   Su2 G2;
    
    zero_SuN(&X);
    one_SuN(G_mag);
@@ -70,11 +68,11 @@ void comp_MAG_gauge_transformation_SuN(SuN X_links[2*STDIM],
      }
    #endif
  
-   // Cycle on all the SU(2) subgroups
+   // cycle on all the SU(2) subgroups
    // see M.D'Elia and C. Bonati Nuc. PHys B 877 (2012) 233-259
-   for(i=0;i<NCOLOR-1;i++)
+   for(i=0; i<NCOLOR-1; i++)
       {
-      for(j=i+1;j<NCOLOR;j++)
+      for(j=i+1; j<NCOLOR; j++)
          {
          vec_x[0] = creal(X.comp[m(i,j)]);
          vec_x[1] = cimag(X.comp[m(j,i)]);
@@ -84,51 +82,51 @@ void comp_MAG_gauge_transformation_SuN(SuN X_links[2*STDIM],
 
          if(X_mod>MIN_VALUE)
            {
-           diagonalize_X_Su2_aux(OverRelaxParam, vec_x, &G_mag_su2);
-           duetoenne(&G_mag_su2, i, j, &aux_g);
+           diagonalize_X_Su2_aux(overrelaxparam, vec_x, &G2);
 
-           // update the X(n) matrix: X->GXGdag
-           times_dag2_SuN(&aux3, &X, &aux_g);
-           times_SuN(&aux2, &aux_g, &aux3);
-           equal_SuN(&X, &aux2);
+           gii= G2.comp[0] + (G2.comp[3])*I;
+           gij= G2.comp[2] + (G2.comp[1])*I;
+           gji=-G2.comp[2] + (G2.comp[1])*I;
+           gjj= G2.comp[0] - (G2.comp[3])*I;
 
+           // update the X matrix: X->G2*X*G2dag
+           // 1st step X->X*G2dag
+           equal_SuN(&aux1, &X);
+           for(k=0; k<NCOLOR; k++)
+              {
+              tmp0=aux1.comp[m(k,i)]*conj(gii)+aux1.comp[m(k,j)]*conj(gij);
+              tmp1=aux1.comp[m(k,i)]*conj(gji)+aux1.comp[m(k,j)]*conj(gjj);
+              X.comp[m(k,i)]=tmp0;
+              X.comp[m(k,j)]=tmp1;
+              }
 
-           // Build the gauge transformation matrix
-           times_SuN(&aux2, &aux_g, G_mag);
-           equal_SuN(G_mag, &aux2);
+           // 2nd step X->G2*X
+           for(k=0; k<NCOLOR; k++)
+              {
+              tmp0=gii*X.comp[m(i,k)]+gij*X.comp[m(j,k)];
+              tmp1=gji*X.comp[m(i,k)]+gjj*X.comp[m(j,k)];
+              X.comp[m(i,k)]=tmp0;
+              X.comp[m(j,k)]=tmp1;
+              }
+
+           // build the gauge transformation matrix G_mag->G2*G_mag
+           for(k=0; k<NCOLOR; k++)
+              {
+              tmp0=gii*G_mag->comp[m(i,k)]+gij*G_mag->comp[m(j,k)];
+              tmp1=gji*G_mag->comp[m(i,k)]+gjj*G_mag->comp[m(j,k)];
+              G_mag->comp[m(i,k)]=tmp0;
+              G_mag->comp[m(j,k)]=tmp1;
+              }
            }
          }
       }
- 
-     #ifdef DEBUG
-     herm_real_check=0.0;
-     herm_imag_check=0.0;
-     trace_check = 0.0+0.0*I;
-
-     for(i=0; i<NCOLOR; i++)
-        {
-        trace_check += X.comp[m(i,i)];
-        for(j=i+1; j<NCOLOR; j++)
-           {
-           herm_real_check += creal(X.comp[m(i,j)]) - creal(X.comp[m(j,i)]);
-           herm_imag_check += cimag(X.comp[m(i,j)]) + cimag(X.comp[m(j,i)]);
-           }
-        }
-
-     if(fabs(herm_real_check) > MIN_VALUE*10 || fabs(herm_imag_check) > MIN_VALUE*10 || cabs(trace_check) > MIN_VALUE*10 )
-       {
-       fprintf(stderr, "herm_real_check = %.12g herm_imag_check = %.12g ", herm_real_check, herm_imag_check);
-       fprintf(stderr, "trace_check_real = %.12g trace_check_imag = %.12g ", creal(trace_check), cimag(trace_check));
-       fprintf(stderr, "(%s, %d)\n", __FILE__, __LINE__);
-       }
-     #endif     
-}
+   }
 
 
 // compute the squared absolute values of out-of-diagonal terms of X(n)
-void comp_outdiagnorm_of_X_SuN (SuN X_links[2*STDIM],
-                                double lambda[NCOLOR],
-                                double *outdiagnorm2)
+void comp_outdiagnorm_of_X_SuN(SuN X_links[2*STDIM],
+                               double const lambda[NCOLOR],
+                               double *outdiagnorm2)
    {
    int i, j, dir;
    double aux=0;
@@ -187,7 +185,7 @@ void comp_outdiagnorm_of_X_SuN (SuN X_links[2*STDIM],
 
 // compute the value of the functional to be maximized in MAG
 void comp_functional_fmag_SuN(SuN X_links[2*STDIM],
-                              double lambda[NCOLOR],
+                              double const lambda[NCOLOR],
                               double *fmag)
    {
    int dir, i;

@@ -1077,7 +1077,7 @@ void higgs_interaction(Gauge_Conf const * const GC,
 // tildeG0=ReTr[(\sum_x Q_x)(\sum_y Q_y)]/volume/NHIGGS
 // tildeGminp=ReTr[(\sum_x Q_xe^{ipx})(\sum_y Q_ye^{-ipy)]/volume/NHIGGS
 //
-// tildeG0 is NHIGGS*susceptibility, tildeGminp is used to compute the 2nd momentum correlation function
+// tildeG0 is susceptibility/NHIGGS, tildeGminp is used to compute the 2nd momentum correlation function
 //
 // tildeD0=conj(\sum_x D_x) (\sum_y D_y) / volume
 // tildeDminp=(\sum_x D_x e^{ipx}) conj(\sum_y D_y e^{ipy}) /volume
@@ -1368,17 +1368,18 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
    int i, dir;
    long r;
    double lambda[NCOLOR];
-   const double OverRelaxParam=1.85;
-   double non_diag_contribution, non_diag_contr_aux;
+   const double overrelaxparam=1.85; // 1.0 means no overrelaxation
+   const double target=1.0e-8;
+   double nondiag, nondiagaux;
 
    // inizialize the matrix lambda = diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
    for(i=0; i<NCOLOR; i++)
       {
-      lambda[i] = ( (double) NCOLOR -1.)/2. - i;
+      lambda[i] = ( (double) NCOLOR -1.)/2. - (double) i;
       }
- 
-   non_diag_contribution=1.0;
-   while(non_diag_contribution > MIN_VALUE)
+
+   nondiag=1;
+   while(nondiag > target)
         {
         #ifdef OPENMP_MODE
         #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
@@ -1389,13 +1390,13 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
 
            // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
            // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
-           for(dir=0;dir<STDIM;dir++)
+           for(dir=0; dir<STDIM; dir++)
               {
               equal(&(X_links[dir]), &(GC->lattice[r][dir]));
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
               }
 
-           comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
+           comp_MAG_gauge_transformation(X_links, lambda, overrelaxparam, &G_mag);
  
            // apply the gauge transformation
            for(dir=0; dir<STDIM; dir++)
@@ -1416,13 +1417,13 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
 
            // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
            // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
-           for(dir=0;dir<STDIM;dir++)
+           for(dir=0; dir<STDIM; dir++)
               {
               equal(&(X_links[dir]), &(GC->lattice[r][dir]));
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
               }
 
-           comp_MAG_gauge_transformation(X_links, lambda, OverRelaxParam, &G_mag);
+           comp_MAG_gauge_transformation(X_links, lambda, overrelaxparam, &G_mag);
 
            // apply the gauge transformation
            for(dir=0; dir<STDIM; dir++)
@@ -1434,27 +1435,30 @@ void max_abelian_gauge_fix(Gauge_Conf *GC,
               }
            }
 
-        // check if the out-of-diagonal-diagonal elements of X(n) are zero
-        non_diag_contr_aux=0;
+        // nondiagaux is the sum of the squares of the out-diagonal terms
+        nondiagaux=0;
 
         #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)  reduction(+ : non_diag_contr_aux)
+        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)  reduction(+ : nondiagaux)
         #endif
-        for(r=0;r<param->d_volume;r++)
+        for(r=0; r<param->d_volume; r++)
            {
            GAUGE_GROUP X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
            double counter;
 
-           for(dir=0;dir<STDIM;dir++)
+           for(dir=0; dir<STDIM; dir++)
               {
               equal(&(X_links[dir]), &(GC->lattice[r][dir]));
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
               }
            comp_outdiagnorm_of_X(X_links, lambda, &counter);
-           non_diag_contr_aux += counter;
+           nondiagaux += counter;
            }
      
-        non_diag_contribution = non_diag_contr_aux * param->d_inv_vol;
+        nondiag = nondiagaux * param->d_inv_vol / (double)NCOLOR / (double) NCOLOR;
+
+        // printf("%g  %g\n", nondiag, nondiag/target);
+        // fflush(stdout);
         }
 
    // unitarize all the links
@@ -1636,17 +1640,9 @@ void wrap_search(Gauge_Conf *GC,
                  long r_tback,
                  int *num_wrap)
    {
-   if(STDIM!=4)
-     {
+   #if STDIM!=4
      fprintf(stderr, "Wrong number of dimensions! (%s, %d)\n", __FILE__, __LINE__);
      exit(EXIT_FAILURE);
-     }
-   #ifdef DEBUG
-   if(DeGrand_current(GC, geo, r_tback, 0)==0)
-     {
-     fprintf(stderr, "Problems in DeGrand_current! (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
    #endif
 
    int dir, n_mu;
