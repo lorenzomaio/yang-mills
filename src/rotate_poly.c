@@ -108,7 +108,7 @@ int main(int argc, char **argv)
    double complex  z_pos, z_neg;
 
    z_pos = -0.5 +  sqrt(3)/2.0*I; // 2pi/3
-   z_neg = +0.5 -  sqrt(3)/2.0*I; // 4pi/3
+   z_neg = -0.5 -  sqrt(3)/2.0*I; // 4pi/3
 
    angle = atan2(polyim[0], polyre[0]);
 
@@ -118,10 +118,7 @@ int main(int argc, char **argv)
    for(long r=0; r<param.d_space_vol;r++)
       {
       r = sisp_and_t_to_si(&geo, r, 0);
-      for(int mu=0;mu<STDIM;mu++)
-         {
-         times_equal_complex(&(GC.lattice[r][mu]), z_pos);
-         }
+      times_equal_complex(&(GC.lattice[r][0]), z_neg);
       }
    }
    // 4pi/3 case
@@ -130,10 +127,7 @@ int main(int argc, char **argv)
    for(long r=0; r<param.d_space_vol;r++)
       {
       r = sisp_and_t_to_si(&geo, r, 0);
-      for(int mu=0;mu<STDIM;mu++)
-         {
-         times_equal_complex(&(GC.lattice[r][mu]), z_neg);
-         }
+      times_equal_complex(&(GC.lattice[r][0]), z_pos);
       }
    }
 
