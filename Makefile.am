@@ -7,7 +7,8 @@ bin_PROGRAMS = conf_check \
                debug_sun \
                debug_u1 \
                debug_vecs \
-               yang_mills_higgs \
+			   measure_poly \
+			   yang_mills_higgs \
                yang_mills_local \
                yang_mills_local_fundadj \
                yang_mills_polycorr \
@@ -131,6 +132,10 @@ conf_check_SOURCES=./src/conf_check.c \
                    $(sun) \
                    $(tens_prod) \
                    $(u1) 
+
+measure_poly_SOURCES=./src/measure_poly.c \
+					${everything}
+
 
 debug_rng_SOURCES=./src/debug_rng.c \
                   $(align) \
