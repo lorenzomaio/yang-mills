@@ -94,7 +94,7 @@ int main(int argc, char **argv)
 
    plaquette(&GC, &geo, &param, &plaqs, &plaqt);
    polyakov_for_tracedef(&GC, &geo, &param, polyre, polyim);
-   fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+   fprintf(datafilep, "%ld %.12g %.12g ", GC.update_index, plaqs, plaqt);
 
    for(i=0; i<(int)floor(NCOLOR/2); i++)
       {

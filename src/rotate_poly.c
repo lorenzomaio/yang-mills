@@ -97,15 +97,57 @@ int main(int argc, char **argv)
 
    for(i=0; i<(int)floor(NCOLOR/2); i++)
       {
-      fprintf(datafilep, "%.12g %.12g %.12g ", polyre[i], polyim[i], NCOLOR*sqrt(pow(polyre[i],2)+pow(polyim[1],2)));
+      fprintf(datafilep, "%.12g %.12g %.12g ", polyre[i], polyim[i], NCOLOR*sqrt(pow(polyre[i],2)+pow(polyim[i],2)));
       }
 
    // now the rotation
 
    double angle;
+   double tolerance = PI/3.0;
+   double complex  z_pos, z_neg;
+
+   z_pos = -0.5 +  sqrt(3)/2.0*I; // 2pi/3
+   z_neg = -0.5 -  sqrt(3)/2.0*I; // 4pi/3
 
    angle = atan2(polyim[0], polyre[0]);
-   printf("%.12g\n", angle);
+
+   //case 2pi/3
+   if((angle< (2.0*PI/3)+tolerance) && (angle >(2.0*PI/3)-tolerance))
+   {
+   for(long r=0; r<param.d_space_vol;r++)
+      {
+      r = sisp_and_t_to_si(&geo, r, 0);
+      for(int mu=0;mu<STDIM;mu++)
+         {
+         times_equal_complex(&(GC.lattice[r][mu]), z_pos);
+         }
+      }
+   }
+   // 4pi/3 case
+   else if ((angle<(-2.0*PI/3)-tolerance) && (angle >-(2*PI/3)+tolerance))
+   {
+   for(long r=0; r<param.d_space_vol;r++)
+      {
+      r = sisp_and_t_to_si(&geo, r, 0);
+      for(int mu=0;mu<STDIM;mu++)
+         {
+         times_equal_complex(&(GC.lattice[r][mu]), z_neg);
+         }
+      }
+   }
+
+   char aux[STD_STRING_LENGTH]="rot_";
+   strcat(aux, param.d_conf_file);
+   write_conf_on_file_with_name(&GC, &param, aux);
+
+   plaquette(&GC, &geo, &param, &plaqs, &plaqt);
+   polyakov_for_tracedef(&GC, &geo, &param, polyre, polyim);
+   fprintf(datafilep, "%ld %.12g %.12g", GC.update_index, plaqs, plaqt);
+
+   for(i=0; i<(int)floor(NCOLOR/2); i++)
+      {
+      fprintf(datafilep, "%.12g %.12g %.12g ", polyre[i], polyim[i], NCOLOR*sqrt(pow(polyre[i],2)+pow(polyim[i],2)));
+      }
 
 
    fclose(datafilep);
