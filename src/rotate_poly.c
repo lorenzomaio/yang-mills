@@ -108,7 +108,7 @@ int main(int argc, char **argv)
    double complex  z_pos, z_neg;
 
    z_pos = -0.5 +  sqrt(3)/2.0*I; // 2pi/3
-   z_neg = -0.5 -  sqrt(3)/2.0*I; // 4pi/3
+   z_neg = +0.5 -  sqrt(3)/2.0*I; // 4pi/3
 
    angle = atan2(polyim[0], polyre[0]);
 
