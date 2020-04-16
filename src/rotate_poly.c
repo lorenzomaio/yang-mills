@@ -86,19 +86,20 @@ int main(int argc, char **argv)
    init_gauge_conf(&GC, &param);
 
    // open the ouputfile
-   datafilep = fopen("plaq_pol.dat", "w");
+   datafilep = fopen("plaq_pol.dat", "a");
 
    // compute the Polyakov observables
    double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1];
 
    plaquette(&GC, &geo, &param, &plaqs, &plaqt);
    polyakov_for_tracedef(&GC, &geo, &param, polyre, polyim);
-   fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+   fprintf(datafilep, "%ld %.12g %.12g ", GC.update_index, plaqs, plaqt);
 
    for(i=0; i<(int)floor(NCOLOR/2); i++)
       {
       fprintf(datafilep, "%.12g %.12g %.12g ", polyre[i], polyim[i], NCOLOR*sqrt(pow(polyre[i],2)+pow(polyim[i],2)));
       }
+   fprintf(datafilep, "\n");
 
    // now the rotation
 
@@ -112,7 +113,7 @@ int main(int argc, char **argv)
    angle = atan2(polyim[0], polyre[0]);
 
    //case 2pi/3
-   if((angle< (2.0*PI/3)+tolerance) && (angle >(2.0*PI/3)-tolerance))
+   if((angle< (2.0*PI/3)+tolerance) && (angle >(2.0*PI/3.0)-tolerance))
    {
    for(long r=0; r<param.d_space_vol;r++)
       {
@@ -124,7 +125,7 @@ int main(int argc, char **argv)
       }
    }
    // 4pi/3 case
-   else if ((angle<(-2.0*PI/3)-tolerance) && (angle >-(2*PI/3)+tolerance))
+   else if ((angle>(-2.0*PI/3.0)-tolerance) && (angle <(-2.0*PI/3.0)+tolerance))
    {
    for(long r=0; r<param.d_space_vol;r++)
       {
@@ -149,6 +150,7 @@ int main(int argc, char **argv)
       fprintf(datafilep, "%.12g %.12g %.12g ", polyre[i], polyim[i], NCOLOR*sqrt(pow(polyre[i],2)+pow(polyim[i],2)));
       }
 
+   fprintf(datafilep, "\n");
 
    fclose(datafilep);
    free_gauge_conf(&GC, &param);

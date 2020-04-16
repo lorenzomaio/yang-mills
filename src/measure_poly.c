@@ -87,7 +87,7 @@ int main(int argc, char **argv)
    init_gauge_conf(&GC, &param);
 
    // open the ouputfile
-   datafilep = fopen("plaq_pol.dat", "w");
+   datafilep = fopen("plaq_pol.dat", "a");
 
    // compute the Polyakov observables
    double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1];
