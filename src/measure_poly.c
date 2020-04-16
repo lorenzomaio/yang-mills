@@ -100,6 +100,8 @@ int main(int argc, char **argv)
       {
       fprintf(datafilep, "%.12g %.12g %.12g ", polyre[i], polyim[i], NCOLOR*sqrt(pow(polyre[i],2)+pow(polyim[i],2)));
       }
+	
+   fprintf(datafilep, "\n");   
 
    fclose(datafilep);
    free_gauge_conf(&GC, &param);

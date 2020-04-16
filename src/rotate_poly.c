@@ -106,6 +106,7 @@ int main(int argc, char **argv)
    double angle;
    double tolerance = PI/3.0;
    double complex  z_pos, z_neg;
+   long   rsp;
 
    z_pos = -0.5 +  sqrt(3)/2.0*I; // 2pi/3
    z_neg = -0.5 -  sqrt(3)/2.0*I; // 4pi/3
@@ -117,8 +118,8 @@ int main(int argc, char **argv)
    {
    for(long r=0; r<param.d_space_vol;r++)
       {
-      r = sisp_and_t_to_si(&geo, r, 0);
-      times_equal_complex(&(GC.lattice[r][0]), z_neg);
+      rsp = sisp_and_t_to_si(&geo, r, 0);
+      times_equal_complex(&(GC.lattice[rsp][0]), z_neg);
       }
    }
    // 4pi/3 case
@@ -126,9 +127,8 @@ int main(int argc, char **argv)
    {
    for(long r=0; r<param.d_space_vol;r++)
       {
-      r = sisp_and_t_to_si(&geo, r, 0);
-      printf("%.12g %.12g\n", creal(z_pos), cimag(z_pos));
-      times_equal_complex(&(GC.lattice[r][0]), z_pos);
+      rsp = sisp_and_t_to_si(&geo, r, 0);
+      times_equal_complex(&(GC.lattice[rsp][0]), z_pos);
       }
    }
 
