@@ -8,6 +8,7 @@ bin_PROGRAMS = conf_check \
                debug_u1 \
                debug_vecs \
 			   measure_poly \
+			   rotate_poly \
 			   yang_mills_higgs \
                yang_mills_local \
                yang_mills_local_fundadj \
@@ -136,6 +137,8 @@ conf_check_SOURCES=./src/conf_check.c \
 measure_poly_SOURCES=./src/measure_poly.c \
 					${everything}
 
+rotate_poly_SOURCES=./src/rotate_poly.c \
+				   ${everything}	
 
 debug_rng_SOURCES=./src/debug_rng.c \
                   $(align) \
@@ -272,4 +275,4 @@ yang_mills_tubeadj_disc_long_SOURCES=./src/yang_mills_tubeadj_disc_long.c \
    
 AM_CFLAGS = -std=c99 -O2 -Wall -Wextra -Werror -pedantic -Wconversion @OPENMP_CFLAGS@
 
-CLEANFILES = dati.dat log.dat dati.log conf.dat* ml.dat template_input.in higgs_conf.dat* mon.dat
+CLEANFILES = dati.dat log.dat dati.log conf.dat* ml.dat template_input.in higgs_conf.dat* mon.dat plaq_pol.dat

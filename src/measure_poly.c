@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 
    for(i=0; i<(int)floor(NCOLOR/2); i++)
       {
-      fprintf(datafilep, "%.12g %.12g %.12g ", polyre[i], polyim[i], NCOLOR*sqrt(pow(polyre[i],2)+pow(polyim[1],2)));
+      fprintf(datafilep, "%.12g %.12g %.12g ", polyre[i], polyim[i], NCOLOR*sqrt(pow(polyre[i],2)+pow(polyim[i],2)));
       }
 
    fclose(datafilep);
