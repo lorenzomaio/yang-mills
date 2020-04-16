@@ -127,6 +127,7 @@ int main(int argc, char **argv)
    for(long r=0; r<param.d_space_vol;r++)
       {
       r = sisp_and_t_to_si(&geo, r, 0);
+      printf("%.12g %.12g\n", creal(z_pos), cimag(z_pos));
       times_equal_complex(&(GC.lattice[r][0]), z_pos);
       }
    }
@@ -137,7 +138,7 @@ int main(int argc, char **argv)
 
    plaquette(&GC, &geo, &param, &plaqs, &plaqt);
    polyakov_for_tracedef(&GC, &geo, &param, polyre, polyim);
-   fprintf(datafilep, "%ld %.12g %.12g", GC.update_index, plaqs, plaqt);
+   fprintf(datafilep, "%ld %.12g %.12g ", GC.update_index, plaqs, plaqt);
 
    for(i=0; i<(int)floor(NCOLOR/2); i++)
       {
