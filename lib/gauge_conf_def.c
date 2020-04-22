@@ -323,6 +323,21 @@ void init_gauge_conf_from_gauge_conf(Gauge_Conf *GC, Gauge_Conf const * const GC
   GC->update_index=GC2->update_index;
   }
 
+void print_double_nice(double a)
+{
+  union number
+  {
+    double d;
+    char c[8];
+  } nunu;
+  nunu.d=a; 
+  for(int i=0;i<8;i++) printf("%d ",nunu.c[i]);
+  printf("\n");
+}
+
+
+
+
 
 // compute the md5sum of the configuration and save it in res, that is a char[2*MD5_DIGEST_LENGTH]
 void compute_md5sum_conf(char *res, Gauge_Conf const * const GC, GParam const * const param)
@@ -367,26 +382,31 @@ void compute_md5sum_conf(char *res, Gauge_Conf const * const GC, GParam const * 
             for(k=0; k<NCOLOR*NCOLOR; k++)
                {
                double complex dc=matrix.comp[k];
-               if(endian()==0)
+   
+            if(endian()==0)
                  {
-                 double a = creal(dc);
-                 double b = cimag(dc);
-                 SwapBytesDouble(&a);
-                 SwapBytesDouble(&b);
-                 dc=a+b*I;
+                 double aux[2];
+
+				 aux[0] = creal(dc);
+				 aux[1] = cimag(dc);
+				 SwapBytesDouble(&aux[0]);
+                 SwapBytesDouble(&aux[1]);
+                 
+				 memcpy((void *)&dc, (void*)aux, sizeof(aux));
                  }
-               MD5_Update(&mdContext, &dc, sizeof(double complex));
+      //         MD5_Update(&mdContext, &dc, sizeof(double complex));
+	//		   printf("%.16lg %.16lg\n", creal(dc), cimag(dc));
+	//			print_double_nice(creal(dc));
+	//			print_double_nice(cimag(dc));
+			
+			    printf("%.16lg %.16lg\n", creal(dc), cimag(dc));
+				MD5_Update(&mdContext, &(dc), sizeof(double complex));
                }
           #endif
         #elif GGROUP == 1
           for(k=0; k<NCOLOR*NCOLOR; k++)
              {
-             double a=matrix.comp[k];
-             if(endian()==0)
-               {
-               SwapBytesDouble(&a);
-               }
-             MD5_Update(&mdContext, &a, sizeof(double));
+	         MD5_Update(&mdContext, &(matrix.comp[k]), sizeof(double));
              }
         #endif
         }
