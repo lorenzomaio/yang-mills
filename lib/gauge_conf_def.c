@@ -383,12 +383,6 @@ void compute_md5sum_conf(char *res, Gauge_Conf const * const GC, GParam const * 
                  {
                  SwapBytesDoubleComplex(&dc);
                  }
-      //         MD5_Update(&mdContext, &dc, sizeof(double complex));
-	//		   printf("%.16lg %.16lg\n", creal(dc), cimag(dc));
-	//			print_double_nice(creal(dc));
-	//			print_double_nice(cimag(dc));
-			
-			    printf("%.16lg %.16lg\n", creal(dc), cimag(dc));
 				MD5_Update(&mdContext, &(dc), sizeof(double complex));
                }
           #endif
