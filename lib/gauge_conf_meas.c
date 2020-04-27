@@ -421,6 +421,60 @@ void clover_disc_energy(Gauge_Conf const * const GC,
 
 
 // compute the mean Polyakov loop (the trace of)
+void polyakov_loc_fluct(Gauge_Conf const * const GC,
+                        Geometry const * const geo,
+                        GParam const * const param,
+                        double *repoly,
+                        double *repoly_local,
+                        double *impoly,
+                        double *impoly_local)
+   {
+   long rsp;
+   double rep, imp, rep_loc, imp_loc;
+
+   rep=0.0;
+   imp=0.0;
+
+   rep_loc=0.0;
+   imp_loc=0.0;
+
+   #ifdef OPENMP_MODE
+   #pragma omp parallel for num_threads(NTHREADS) private(rsp) reduction(+ : rep) reduction(+ : imp) reduction(+ : rep_loc) reduction(+ : imp_loc)
+   #endif
+   for(rsp=0; rsp<param->d_space_vol; rsp++)
+      {
+      long r;
+      int i;
+      GAUGE_GROUP matrix, matrix2;
+
+      r=sisp_and_t_to_si(geo, rsp, 0);
+
+      one(&matrix);
+      one(&matrix2);
+
+      for(i=0; i<param->d_size[0]; i++)
+         {
+         times_equal(&matrix, &(GC->lattice[r][0]));
+         r=nnp(geo, r, 0);
+         }
+
+      times(&matrix2, &matrix, &matrix);
+
+      rep+=retr(&matrix);
+      imp+=imtr(&matrix);
+
+      rep_loc+=retr(&matrix);
+      imp_loc+=imtr(&matrix);
+      }
+
+   *repoly=rep*param->d_inv_space_vol;
+   *impoly=imp*param->d_inv_space_vol;
+
+   *repoly_local=rep_loc*param->d_inv_space_vol;
+   *impoly_local=imp_loc*param->d_inv_space_vol;
+   }
+
+// compute the mean Polyakov loop (the trace of)
 void polyakov(Gauge_Conf const * const GC,
               Geometry const * const geo,
               GParam const * const param,
