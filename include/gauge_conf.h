@@ -219,9 +219,8 @@ void polyakov_loc_fluct(Gauge_Conf const * const GC,
                         Geometry const * const geo,
                         GParam const * const param,
                         double *repoly,
-                        double *repoly_local,
                         double *impoly,
-                        double *impoly_local);
+                        double *mod_local);
 
 void polyakov(Gauge_Conf const * const GC,
               Geometry const * const geo,

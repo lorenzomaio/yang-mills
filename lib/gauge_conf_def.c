@@ -174,14 +174,14 @@ void read_gauge_conf(Gauge_Conf *GC, GParam const * const param)
        }
     fclose(fp);
 
-    // compute the new md5sum and check for consistency
+     compute the new md5sum and check for consistency
     compute_md5sum_conf(md5sum_new, GC, param);
     if(strncmp(md5sum_old, md5sum_new, 2*MD5_DIGEST_LENGTH+1)!=0)
       {
       fprintf(stderr, "The computed md5sum %s does not match the stored %s for the file %s (%s, %d)\n", md5sum_new, md5sum_old, param->d_conf_file, __FILE__, __LINE__);
       exit(EXIT_FAILURE);
       }
-    }
+      }
   }
 
 

@@ -90,17 +90,17 @@ int main(int argc, char **argv)
    datafilep = fopen("plaq_pol.dat", "a");
 
    // compute the Polyakov observables
-   double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1], polyre_loc, polyim_loc;
+   double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1], mod_loc;
 
    plaquette(&GC, &geo, &param, &plaqs, &plaqt);
    polyakov_for_tracedef(&GC, &geo, &param, polyre, polyim);
-   polyakov_loc_fluct(&GC, &geo, &param, polyre, &polyre_loc, polyim, &polyim_loc);
+   polyakov_loc_fluct(&GC, &geo, &param, polyre, polyim, &mod_loc);
    fprintf(datafilep, "%ld %.12g %.12g ", GC.update_index, plaqs, plaqt);
 
    for(i=0; i<(int)floor(NCOLOR/2); i++)
       {
       fprintf(datafilep, "%.12g %.12g %.12g %.12g ", polyre[i], polyim[i], NCOLOR*sqrt(pow(polyre[i],2)+pow(polyim[i],2)),
-                                                           NCOLOR*sqrt(pow(polyre_loc,2) + pow(polyim_loc,2)));
+                                                           mod_loc - NCOLOR*sqrt(pow(polyre[i],2) + pow(polyim[i],2)));
       }
 	
    fprintf(datafilep, "\n");   
