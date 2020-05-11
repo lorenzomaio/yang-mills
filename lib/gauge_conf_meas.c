@@ -444,7 +444,7 @@ void polyakov_loc_fluct(Gauge_Conf const * const GC,
       {
       long r;
       int i;
-      GAUGE_GROUP matrix, matrix2;
+      GAUGE_GROUP matrix;
 
       r=sisp_and_t_to_si(geo, rsp, 0);
 

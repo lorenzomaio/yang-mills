@@ -9,6 +9,7 @@ bin_PROGRAMS = conf_check \
                debug_vecs \
 			   measure_poly \
 			   rotate_poly \
+			   meas_monopoles \
 			   yang_mills_higgs \
                yang_mills_local \
                yang_mills_local_fundadj \
@@ -135,6 +136,9 @@ conf_check_SOURCES=./src/conf_check.c \
                    $(u1) 
 
 measure_poly_SOURCES=./src/measure_poly.c \
+					${everything}
+
+meas_monopoles_SOURCES=./src/meas_monopoles.c \
 					${everything}
 
 rotate_poly_SOURCES=./src/rotate_poly.c \

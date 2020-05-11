@@ -68,6 +68,7 @@ src/yang_mills_t0.c
 src/yang_mills_tracedef.c
 src/yang_mills_tube_conn.c
 src/yang_mills_tube_conn_long.c
+src/meas_monopoles.c
 lib/aligncheck.c
 include/tens_prod_adj.h
 lib/tens_prod_adj.c
