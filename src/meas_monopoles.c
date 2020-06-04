@@ -91,7 +91,7 @@ int main(int argc, char **argv)
    monofilep = fopen("mon.dat", "a");
 
    // compute the Polyakov observables
-   double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1], mod_loc;
+   double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1], mod_loc, aux;
 
    plaquette(&GC, &geo, &param, &plaqs, &plaqt);
    polyakov_for_tracedef(&GC, &geo, &param, polyre, polyim);
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
       fprintf(datafilep, "%.12g %.12g %.12g %.12g ", polyre[i], polyim[i], NCOLOR*sqrt(pow(polyre[i],2)+pow(polyim[i],2)),
                                                            mod_loc - NCOLOR*sqrt(pow(polyre[i],2) + pow(polyim[i],2)));
       }
-	
+   aux = NCOLOR*sqrt(pow(polyre[0],2) + pow(polyim[0],2));
    fprintf(datafilep, "\n");   
 
    fclose(datafilep);
@@ -134,7 +134,7 @@ int main(int argc, char **argv)
       // extract the abelian component subg and save it to GC->u1_subg
       U1_extract(&helperconf, &param, subg);
       // compute monopole observables
-      monopoles_obs(&helperconf, &geo, &param, subg, monofilep);
+      monopoles_obs(&helperconf, &geo, &param, subg, aux, monofilep);
       }
       free_diag_proj_stuff(&helperconf, &param);
       free_gauge_conf(&helperconf, &param);

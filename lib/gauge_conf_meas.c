@@ -840,13 +840,14 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                FILE *datafilep,
                                FILE *monofilep)
    {
-   double plaqs, plaqt, polyre, polyim;
+   double plaqs, plaqt, polyre, polyim, mod_pol;
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov(GC, geo, param, &polyre, &polyim);
 
 
    fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
+   mod_pol = NCOLOR*sqrt(polyre*polyre + polyim*polyim);
 
    // topological observables
    #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
@@ -914,7 +915,7 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
         U1_extract(&helperconf, param, subg);
 
         // compute monopole observables
-        monopoles_obs(&helperconf, geo, param, subg, monofilep);
+        monopoles_obs(&helperconf, geo, param, subg,mod_pol, monofilep);
         }
 
      free_diag_proj_stuff(&helperconf, param);
@@ -936,10 +937,11 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
                                              FILE *monofilep)
    {
    int i;
-   double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1]; // +1 just to avoid warning if NCOLOR=1
+   double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1], mod_pol; // +1 just to avoid warning if NCOLOR=1
 
    plaquette(GC, geo, param, &plaqs, &plaqt);
    polyakov_for_tracedef(GC, geo, param, polyre, polyim);
+   mod_pol = NCOLOR*sqrt(polyre[0]*polyre[0] + polyim[0]*polyim[0]);
    fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
 
    for(i=0; i<(int)floor(NCOLOR/2); i++)
@@ -1015,7 +1017,7 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
         U1_extract(&helperconf, param, subg);
 
         // compute monopole observables
-        monopoles_obs(&helperconf, geo, param, subg, monofilep);
+        monopoles_obs(&helperconf, geo, param, subg, mod_pol, monofilep);
         }
      free_diag_proj_stuff(&helperconf, param);
      free_gauge_conf(&helperconf, param);
@@ -1751,13 +1753,13 @@ void monopoles_obs(Gauge_Conf *GC,
                    Geometry const * const geo,
                    GParam const * const param, 
                    int subg,
+                   double mod_pol,
                    FILE* monofilep)
    {
    double mean_wrap;
    long r, rsp, r_tback, r_tbackback;
    int n_mu, num_wrap, mono_charge;
    int cartcoord[4];
-
    mean_wrap = 0.0;     // mean value of monopole wraps for unit volume
 
    for(rsp=0; rsp<param->d_space_vol; rsp++)
@@ -1791,7 +1793,7 @@ void monopoles_obs(Gauge_Conf *GC,
                 {
                 fprintf(monofilep, "%d ", cartcoord[k]);
                 }
-             fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
+             fprintf(monofilep, "%.12g %d %d %d\n", mod_pol, subg, n_mu, num_wrap);
              }
            else if(GC->uflag[r_tback][0] == 1) // this is to print only once monopole of charge +2
                   {
@@ -1801,7 +1803,7 @@ void monopoles_obs(Gauge_Conf *GC,
                      {
                      fprintf(monofilep, "%d ", cartcoord[k]);
                      }
-                  fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
+                  fprintf(monofilep, "%.12g %d %d %d\n", mod_pol, subg, n_mu, num_wrap);
                   }
            }
          }
@@ -1828,7 +1830,7 @@ void monopoles_obs(Gauge_Conf *GC,
                 {
                 fprintf(monofilep, "%d ", cartcoord[k]);
                 }
-             fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
+             fprintf(monofilep, "%.12g %d %d %d\n", mod_pol, subg, n_mu, num_wrap);
              }
            else if(GC->uflag[r][0] == -1)  // this is to print only once monopole of charge +2
                   {
@@ -1838,7 +1840,7 @@ void monopoles_obs(Gauge_Conf *GC,
                      {
                      fprintf(monofilep, "%d ", cartcoord[k]);
                      }
-                  fprintf(monofilep, "%d %d %d\n", subg, n_mu, num_wrap);
+                  fprintf(monofilep, "%.12g %d %d %d\n", mod_pol, subg, n_mu, num_wrap);
                   }
            }
          }
