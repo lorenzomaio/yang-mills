@@ -13,7 +13,7 @@
 int main(void)
   {
   unsigned int seme=0;
-  int i;
+  int i, k;
   double energy;
 
   GAUGE_VECS M, N, L;
@@ -23,7 +23,7 @@ int main(void)
   initrand(seme);
 
   printf("\n***************************************************\n");
-  printf("PROGRAM FOR THE DEBUG OF VECS [for U1, Su2 and SuN] \n");
+  printf("PROGRAM FOR THE DEBUG OF VECS \n");
   printf("***************************************************\n\n");
 
   printf("GGROUP=%s\n", QUOTEME(GGROUP));
@@ -64,6 +64,27 @@ int main(void)
     }
   printf("\n");
 
+  if(NHIGGS>1)
+    {
+    printf("VERIFY THAT THE TWO COMPONENT ROTATION DOES NOT CHANGE THE NORMALIZATION ...");
+    rand_vecs(&M);
+    i=(int) (NHIGGS*casuale()-MIN_VALUE);
+    k=(i+1 + (int)((NHIGGS-1)*casuale()*(1.0 - MIN_VALUE)) )% NHIGGS;
+    rotate_two_components_vecs(&L, &M, i, k, PI2*casuale());
+    energy=norm_vecs(&L);
+    if(fabs(energy-1) < MIN_VALUE)
+      {
+      printf("  OK\n");
+      }
+    else
+      {
+      printf("  ERROR!!!!!!!!!!!\n");
+      return EXIT_FAILURE;
+      }
+    printf("\n");
+    }
+
+  #if GGROUP == 0 // only for SuN groups
   printf("VERIFY THAT THE RANDOM PHASE MULTIPLICATION DOES NOT CHANGE THE NORMALIZATION ...");
   rand_vecs(&L);
   i=(int) (NHIGGS*casuale()-MIN_VALUE);
@@ -80,8 +101,9 @@ int main(void)
     return EXIT_FAILURE;
     }
   printf("\n");
+  #endif
 
-  printf("VERIFY THAT OVERRELAXATION DOES NOT CHANGE THE ENERGY ...");
+  printf("VERIFY THAT OVERRELAXATION DOES NOT CHANGE ENERGY AND NORMALIZATION ...");
   rand_vecs(&M);
   equal_vecs(&L, &M);
   rand_vecs(&N);
@@ -95,13 +117,50 @@ int main(void)
 
   if(fabs(energy)<MIN_VALUE)
     {
+    printf("  OK");
+    }
+  else
+    {
+    printf("  ERROR!!!!!!!!!!!   DeltaE=%g  ", energy);
+    return EXIT_FAILURE;
+    }
+
+  energy=norm_vecs(&M);
+  if(fabs(energy-1)<MIN_VALUE)
+    {
     printf("  OK\n");
     }
   else
     {
-    printf("  ERROR!!!!!!!!!!!   DeltaE=%g\n", energy);
+    printf("  ERROR!!!!!!!!!!!\n");
     return EXIT_FAILURE;
     }
+  printf("\n");
+
+  printf("VERIFY THAT OVERRELAXATION IS REVERSIBLE ...");
+  rand_vecs(&M);
+  equal_vecs(&L, &M);
+  rand_vecs(&N);
+  times_equal_real_vecs(&N, casuale());
+
+  single_overrelaxation_vecs(&M, &N);
+  single_overrelaxation_vecs(&M, &N);
+
+  times_equal_real_vecs(&M, -1);
+  plus_equal_vecs(&M, &L);
+
+  energy=norm_vecs(&M);
+  if(fabs(energy)<MIN_VALUE)
+    {
+    printf("  OK");
+    }
+  else
+    {
+    printf("  ERROR!!!!!!!!!!!   Delta=%g  ", energy);
+    return EXIT_FAILURE;
+    }
+  printf("\n");
+
 
   printf("\nTEST PASSED\n\n");
 

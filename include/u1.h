@@ -853,6 +853,23 @@ inline void times_equal_complex_single_U1Vecs(U1Vecs * restrict A, double comple
   }
 
 
+// *= with complex number
+inline void times_equal_complex_U1Vecs(U1Vecs * restrict A, double complex r)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(A->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     A->comp[i]*=r;
+     }
+  }
+
+
+
 // norm
 inline double norm_U1Vecs(U1Vecs const * const restrict A)
   {
@@ -903,6 +920,26 @@ inline double re_scal_prod_U1Vecs(U1Vecs const * const restrict v1, U1Vecs const
   for(i=0; i<NHIGGS; i++)
      {
      ris+=creal( conj(v1->comp[i]) * v2->comp[i] );
+     }
+
+  return ris;
+  }
+
+
+// real part of the scalar product re(v_1^{\dag}v_2)
+inline double complex complex_scal_prod_U1Vecs(U1Vecs const * const restrict v1, U1Vecs const * const restrict v2)
+  {
+   #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int i;
+  double complex ris=0.0+0.0*I;
+
+  for(i=0; i<NHIGGS; i++)
+     {
+     ris+=conj(v1->comp[i]) * v2->comp[i];
      }
 
   return ris;
@@ -962,6 +999,30 @@ inline void matrix_times_vector_all_U1Vecs(U1Vecs * restrict v1,
   for(i=0; i<NHIGGS; i++)
      {
      v1->comp[i]=(matrix->comp)*(v2->comp[i]);
+     }
+  }
+
+
+// rotate two components of the vector
+inline void rotate_two_components_U1Vecs(U1Vecs * restrict v1,
+                                         U1Vecs const * const restrict v2,
+                                         int i,
+                                         int j,
+                                         double angle)
+  {
+  #ifdef __INTEL_COMPILER
+  __assume_aligned(&(v1->comp), DOUBLE_ALIGN);
+  __assume_aligned(&(v2->comp), DOUBLE_ALIGN);
+  #endif
+
+  int k;
+
+  equal_U1Vecs(v1, v2);
+
+  for(k=0; k<NCOLOR; k++)
+     {
+     v1->comp[NCOLOR*i+k]= cos(angle)*v2->comp[NCOLOR*i+k] + sin(angle)*v2->comp[NCOLOR*j+k];
+     v1->comp[NCOLOR*j+k]=-sin(angle)*v2->comp[NCOLOR*i+k] + cos(angle)*v2->comp[NCOLOR*j+k];
      }
   }
 

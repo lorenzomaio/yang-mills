@@ -79,6 +79,7 @@ void readinput(char *in_file, GParam *param)
        }
     param->d_theta=0.0;
     param->d_mon_meas=0; // if =1 monopole measures are performed
+    param->d_higgs_beta=0.0;
 
     input=fopen(in_file, "r");  // open the input file
     if(input==NULL)
@@ -1077,7 +1078,7 @@ void print_parameters_polycorr_higgs_long(GParam * param, time_t time_start, tim
     fprintf(fp, "\n");
 
     fprintf(fp, "epsilon_metro: %.10lf\n", param->d_epsilon_metro);
-    fprintf(fp, "metropolis acceptance: %.10lf\n", acc);
+    fprintf(fp, "metropolis acceptance (different from zero only when the whole lattice is updated!): %.10lf\n", acc);
     fprintf(fp, "\n");
 
     fprintf(fp, "multihit:   %d\n", param->d_multihit);
