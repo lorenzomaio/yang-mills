@@ -134,7 +134,10 @@ int main(int argc, char **argv)
       // extract the abelian component subg and save it to GC->u1_subg
       U1_extract(&helperconf, &param, subg);
       // compute monopole observables
-      monopoles_obs(&helperconf, &geo, &param, subg, aux, monofilep);
+       monopoles_obs(&helperconf, &geo, &param, subg, aux, monofilep);
+     
+      //monopoles_clusters(&helperconf, &geo, &param, subg, monofilep);
+      // compute the cluster of monopoles currents.
       }
       free_diag_proj_stuff(&helperconf, &param);
       free_gauge_conf(&helperconf, &param);

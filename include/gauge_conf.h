@@ -49,7 +49,11 @@ typedef struct Gauge_Conf {
   double ***diag_proj; // [volume] [STDIM] [NCOLOR]
   double **u1_subg;    // [volume] [STDIM]
   double **uflag;      // [volume] [STDIM] this is used to check if the link has already been considered in the searching of the wraps
- 
+  double **currents;      // [volume] [STDIM] this stores the currents in every point and direction
+  double **all_currents;  // [volume] [2*STDIM] this stores all the monopoles currents passing from a given site.
+                       // directions from STDIM to 2*STDIM are the first direction, but considered backward
+  double *abs_currents;  // [volume]  this stores the number of monopoles currents passing in a given site.
+                       // this is used in the computation of the clusters of monopole currents.
   } Gauge_Conf;
 
 
@@ -325,6 +329,19 @@ void monopoles_obs(Gauge_Conf *GC,
                    double mod_pol,
                    FILE* monofilep);
 
+void compute_cluster(Gauge_Conf *GC,
+                     Geometry const * const geo,
+                     GParam const * const param,
+                     long r_current,
+                     long r_start,
+                     long * lenght);
+
+
+void monopoles_clusters(Gauge_Conf *GC,
+                        Geometry const * const geo,
+                        GParam const * const param,
+                        int subg,
+                        FILE* mono_cluster_filep);
 
 // in gauge_conf_meas_multilevel.c
 void optimize_multihit_polycorr(Gauge_Conf *GC,

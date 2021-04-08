@@ -1746,6 +1746,128 @@ void wrap_search(Gauge_Conf *GC,
      }
    }
 
+// GC->uflag[][] will be used to store the monopole current at a given point
+// (when GC->uflag is allocated it is also initialized to zero)
+void monopoles_clusters(Gauge_Conf *GC,
+                        Geometry const * const geo,
+                        GParam const * const param,
+                        int subg,
+                        FILE* mono_cluster_filep)
+   {
+   long r, lenght, r_start, r_current;
+   int cartcoord[4];
+   int dir;
+
+   // initialize to zero GC->abs_current
+   for(r=0; r<param->d_volume; r++)
+      {
+      GC->abs_currents[r] = 0.0;
+      }
+
+   // now compute the DeGrant current in every site and direction. 
+   for(r=0; r<param->d_volume; r++)
+      {
+      for(dir=0; dir<STDIM; dir++)
+         {
+         // the current at site r and direction dir is saved in the r-dir, dir position of GC->currents.
+         // this is done to preserve the dual lattice. Ipse dixit MDE
+         GC->currents[nnm(geo, r, dir)][dir] = DeGrand_current(GC, geo, r, dir);
+         }
+      }
+
+   // now populate GC->all_currents and GC->abs_currents
+   // dir 0-3 are the same, 4-8 are the opposite directions
+   for(r=0; r<param->d_volume; r++)
+      {
+      for(dir=0; dir<STDIM; dir++)
+         {
+         GC->all_currents[r][dir] = GC->currents[r][dir];
+         GC->all_currents[r][dir + STDIM] = -GC->currents[nnm(geo, r, dir)][dir];
+         GC->abs_currents[r] += (fabs(GC->currents[r][dir]) +fabs(GC->currents[nnm(geo, r, dir)][dir]));
+         }
+         //lexeo_to_cart(cartcoord, r, p aram);
+         //fprintf(mono_cluster_filep, "%d %d %d %d %lf\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3],  GC->abs_currents[r]);
+      }
+
+   // cycle over the volume keeping track of the starting point r_start.
+   for(r_start=0; r_start<param->d_volume; r_start++)
+      {
+      lenght = 0.0;
+      if(GC->abs_currents[r_start] > 0)
+         {
+         r_current = r_start;
+         compute_cluster(GC, geo, param, r_current, r_start, &lenght);
+         lexeo_to_cart(cartcoord, r_current, param);
+         fprintf(mono_cluster_filep, "%d %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], subg, lenght);
+         }
+      }
+
+   }
+
+void compute_cluster(Gauge_Conf *GC,
+                     Geometry const * const geo,
+                     GParam const * const param,
+                     long r_current,
+                     long r_start,
+                     long * lenght)
+   {
+   int find_flag=0;
+   int i, dir, dir_neg;
+   long r_new, r_aux;
+
+   r_aux = r_current;
+   // search currents in all the possible direction from r_start
+   for(i=0;i<2*STDIM;i++)
+      {
+      if(GC->all_currents[r_aux][i] > 0)
+         {
+         dir = i;
+         find_flag = 1;
+
+         *lenght += 1;
+
+         if(dir<4)
+            {
+            dir_neg = STDIM + dir;
+            r_new = nnp(geo, r_aux, dir);
+            }
+         else
+            {
+            dir_neg = dir - STDIM;
+            r_new = nnm(geo, r_aux, dir_neg);
+            }
+
+         GC->all_currents[r_aux][dir] -= 1.0;
+         GC->abs_currents[r_aux] -= 1.0;
+
+         GC->all_currents[r_new][dir_neg] += 1.0;
+         GC->abs_currents[r_new] -= 1.0;
+        
+         if(GC->abs_currents[r_new]<1.0)
+            {
+            if(r_new == r_aux)
+               {
+               printf("Partial Length = %ld\n", *lenght);
+               fflush(stdout);
+               }
+            else
+               {
+               printf("ERROR: CURRENT LOOP DOES NOT CLOSE\n");
+               exit(1);
+               }
+            }
+         else
+            {
+            compute_cluster(GC, geo, param, r_new, r_start, lenght);
+            }
+         }
+      }
+      if(find_flag == 0)
+         {
+         printf("ERROR! NO CURRENT IN CURRENT POINT\n");
+         exit(1);
+         }
+   }
 
 // GC->uflag[][] has to be initialized to zero before calling this function
 // (when GC->uflag is allocated it is also initialized to zero)

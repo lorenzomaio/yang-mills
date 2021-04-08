@@ -2196,7 +2196,50 @@ void alloc_diag_proj_stuff(Gauge_Conf *GC,
        exit(EXIT_FAILURE);
        }
      }
+
+   // alloc currents
+   err=posix_memalign((void**) &(GC->currents), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
+   if(err!=0)
+     {
+     fprintf(stderr, "Problems in allocating uflag (%s, %d)\n", __FILE__, __LINE__);
+     exit(EXIT_FAILURE);
+     }
+   for(r=0;r<param->d_volume;r++)
+     {
+     err=posix_memalign((void**) &(GC->currents[r]), (size_t)DOUBLE_ALIGN, (size_t) STDIM * sizeof(double));
+     if(err!=0)
+       {
+       fprintf(stderr, "Problems in allocating uflag (%s, %d)\n", __FILE__, __LINE__);
+       exit(EXIT_FAILURE);
+       }
+     }
+
+  // alloc all_currents
+  err=posix_memalign((void**) &(GC->all_currents), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating all_currents (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
+  for(r=0;r<param->d_volume;r++)
+    {
+    err=posix_memalign((void**) &(GC->all_currents[r]), (size_t)DOUBLE_ALIGN, (size_t) 2 * STDIM * sizeof(double));
+    if(err!=0)
+      {
+      fprintf(stderr, "Problems in allocating all_currents (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+      }
+    }
+  // alloc abs_currents
+  err=posix_memalign((void**) &(GC->abs_currents), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
+  if(err!=0)
+    {
+    fprintf(stderr, "Problems in allocating abs_currents (%s, %d)\n", __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+    }
    }
+
+
 
 
 // free diagonal projection related stuff
@@ -2227,6 +2270,20 @@ void free_diag_proj_stuff(Gauge_Conf *GC,
       free((GC->uflag[r]));
       }
    free(GC->uflag);
+
+   for(r=0;r<param->d_volume;r++)
+      {
+      free((GC->currents[r]));
+      }
+   free(GC->currents);
+
+   for(r=0;r<param->d_volume;r++)
+      {
+      free((GC->all_currents[r]));
+      }
+   free(GC->all_currents);
+   
+   free(GC->abs_currents);
    }
 
 
