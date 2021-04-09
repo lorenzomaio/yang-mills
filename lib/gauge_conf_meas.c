@@ -1756,7 +1756,7 @@ void monopoles_clusters(Gauge_Conf *GC,
    {
    long r, lenght, r_start, r_current;
    int cartcoord[4];
-   int dir;
+   int dir, dir_neg;
 
    // initialize to zero GC->abs_current
    for(r=0; r<param->d_volume; r++)
@@ -1781,9 +1781,10 @@ void monopoles_clusters(Gauge_Conf *GC,
       {
       for(dir=0; dir<STDIM; dir++)
          {
+         dir_neg = 2*STDIM - dir - 1;
          GC->all_currents[r][dir] = GC->currents[r][dir];
-         GC->all_currents[r][dir + STDIM] = -GC->currents[nnm(geo, r, dir)][dir];
-         GC->abs_currents[r] += (fabs(GC->currents[r][dir]) +fabs(GC->currents[nnm(geo, r, dir)][dir]));
+         GC->all_currents[r][dir_neg] = -GC->currents[nnm(geo, r, dir)][dir];
+         GC->abs_currents[r] += (fabs(GC->currents[r][dir]) + fabs(GC->currents[nnm(geo, r, dir)][dir]));
          }
          //lexeo_to_cart(cartcoord, r, p aram);
          //fprintf(mono_cluster_filep, "%d %d %d %d %lf\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3],  GC->abs_currents[r]);
@@ -1793,6 +1794,7 @@ void monopoles_clusters(Gauge_Conf *GC,
    for(r_start=0; r_start<param->d_volume; r_start++)
       {
       lenght = 0.0;
+      fflush(stdout);
       if(GC->abs_currents[r_start] > 0)
          {
          r_current = r_start;
@@ -1815,40 +1817,78 @@ void compute_cluster(Gauge_Conf *GC,
    int i, dir, dir_neg;
    long r_new, r_aux;
 
-   r_aux = r_current;
+   r_aux = r_start;
    // search currents in all the possible direction from r_start
    for(i=0;i<2*STDIM;i++)
       {
-      if(GC->all_currents[r_aux][i] > 0)
+      //printf("--------------------------> %ld\n", r_current);
+      if(GC->all_currents[r_current][i] > 0)
          {
          dir = i;
          find_flag = 1;
 
          *lenght += 1;
 
+         //printf("DIREZIONE TROVATA %d\n", i);
+         //fflush(stdout);
+         dir_neg = 2*STDIM - dir - 1;
+        // printf("DIREZIONE NEGATIVA %d\n", dir_neg);
+         //fflush(stdout);
          if(dir<4)
             {
-            dir_neg = STDIM + dir;
-            r_new = nnp(geo, r_aux, dir);
+            //lexeo_to_cart(cartcoord, r_current, param);
+            //printf("OLD POINT %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_current);
+            //printf("OLD POINT CURR %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_aux][0], GC->all_currents[r_aux][1], GC->all_currents[r_aux][2], GC->all_currents[r_aux][3], GC->all_currents[r_aux][4], GC->all_currents[r_aux][5], GC->all_currents[r_aux][6], GC->all_currents[r_aux][7]);
+            //fflush(stdout);
+
+            r_new = nnp(geo, r_current, dir);
+
+            //lexeo_to_cart(cartcoord, r_new, param);
+            //printf("NEW POINT  %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_new);
+            //fflush(stdout);
             }
          else
             {
-            dir_neg = dir - STDIM;
-            r_new = nnm(geo, r_aux, dir_neg);
+            //lexeo_to_cart(cartcoord, r_current, param);
+            //printf("OLD POINT %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_current);
+            //printf("OLD POINT CURR %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_aux][0], GC->all_currents[r_aux][1], GC->all_currents[r_aux][2], GC->all_currents[r_aux][3], GC->all_currents[r_aux][4], GC->all_currents[r_aux][5], GC->all_currents[r_aux][6], GC->all_currents[r_aux][7]);
+            //fflush(stdout);
+
+            r_new = nnm(geo, r_current, dir_neg);
+
+            //lexeo_to_cart(cartcoord, r_new, param);
+            //printf("NEW POINT %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_new);
+            //fflush(stdout);
             }
+         
 
-         GC->all_currents[r_aux][dir] -= 1.0;
-         GC->abs_currents[r_aux] -= 1.0;
+         GC->all_currents[r_current][dir] -= 1.0;
 
-         GC->all_currents[r_new][dir_neg] += 1.0;
-         GC->abs_currents[r_new] -= 1.0;
+         //printf("OLD POINT CURR AGG %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_aux][0], GC->all_currents[r_aux][1], GC->all_currents[r_aux][2], GC->all_currents[r_aux][3], GC->all_currents[r_aux][4], GC->all_currents[r_aux][5], GC->all_currents[r_aux][6], GC->all_currents[r_aux][7]);
+         //fflush(stdout);
+
+         GC->abs_currents[r_current] -= 1.0;
+
+         //printf("NEW POINT CURR  %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_new][0], GC->all_currents[r_new][1], GC->all_currents[r_new][2], GC->all_currents[r_new][3], GC->all_currents[r_new][4], GC->all_currents[r_new][5], GC->all_currents[r_new][6], GC->all_currents[r_new][7]);
         
+         GC->all_currents[r_new][dir_neg] += 1.0;
+
+         //printf("NEW POINT CURR AGG %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_new][0], GC->all_currents[r_new][1], GC->all_currents[r_new][2], GC->all_currents[r_new][3], GC->all_currents[r_new][4], GC->all_currents[r_new][5], GC->all_currents[r_new][6], GC->all_currents[r_new][7]);
+         //printf("OLD %lf\n", GC->abs_currents[r_new]);
+         //fflush(stdout);
+
+         GC->abs_currents[r_new] -= 1.0;
+
+         //printf("NEW %lf\n", GC->abs_currents[r_new]);
+         //fflush(stdout);
+         //printf("START AND NEW %ld %ld\n", r_current, r_new);
+
          if(GC->abs_currents[r_new]<1.0)
             {
-            if(r_new == r_aux)
+            if(r_new == r_start)
                {
-               printf("Partial Length = %ld\n", *lenght);
-               fflush(stdout);
+               //printf("Partial Length = %ld\n", *lenght);
+               //fflush(stdout);
                }
             else
                {
@@ -1860,6 +1900,7 @@ void compute_cluster(Gauge_Conf *GC,
             {
             compute_cluster(GC, geo, param, r_new, r_start, lenght);
             }
+         r_start = r_current;
          }
       }
       if(find_flag == 0)
