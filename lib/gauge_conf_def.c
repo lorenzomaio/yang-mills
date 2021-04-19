@@ -2201,7 +2201,7 @@ void alloc_diag_proj_stuff(Gauge_Conf *GC,
    err=posix_memalign((void**) &(GC->currents), (size_t)DOUBLE_ALIGN, (size_t) param->d_volume * sizeof(double));
    if(err!=0)
      {
-     fprintf(stderr, "Problems in allocating uflag (%s, %d)\n", __FILE__, __LINE__);
+     fprintf(stderr, "Problems in allocating currents (%s, %d)\n", __FILE__, __LINE__);
      exit(EXIT_FAILURE);
      }
    for(r=0;r<param->d_volume;r++)
@@ -2209,7 +2209,7 @@ void alloc_diag_proj_stuff(Gauge_Conf *GC,
      err=posix_memalign((void**) &(GC->currents[r]), (size_t)DOUBLE_ALIGN, (size_t) STDIM * sizeof(double));
      if(err!=0)
        {
-       fprintf(stderr, "Problems in allocating uflag (%s, %d)\n", __FILE__, __LINE__);
+       fprintf(stderr, "Problems in allocating currents (%s, %d)\n", __FILE__, __LINE__);
        exit(EXIT_FAILURE);
        }
      }

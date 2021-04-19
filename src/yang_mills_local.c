@@ -26,7 +26,7 @@ void real_main(char *in_file)
 
     char name[STD_STRING_LENGTH], aux[STD_STRING_LENGTH];
     int count;
-    FILE *datafilep, *monofilep;
+    FILE *datafilep, *monofilep, *monofile_clusterp;
     time_t time1, time2;
 
     // to disable nested parallelism
@@ -47,12 +47,12 @@ void real_main(char *in_file)
     if(param.d_mon_meas == 1)
       {
       init_mon_file(&monofilep, &param);
+      init_mon_cluster_file(&monofile_clusterp, &param);
       }
 
     // initialize geometry
     init_indexing_lexeo();
     init_geometry(&geo, &param);
-
     // initialize gauge configuration
     init_gauge_conf(&GC, &param);
 
@@ -65,7 +65,7 @@ void real_main(char *in_file)
 
        if(count % param.d_measevery ==0 && count >= param.d_thermal)
          {
-         perform_measures_localobs(&GC, &geo, &param, datafilep, monofilep);
+         perform_measures_localobs(&GC, &geo, &param, datafilep, monofilep, monofile_clusterp);
          }
 
        // save configuration for backup
@@ -157,6 +157,7 @@ void print_template_input(void)
     fprintf(fp, "conf_file  conf.dat\n");
     fprintf(fp, "data_file  dati.dat\n");
     fprintf(fp, "mon_file   mon.dat\n");
+    fprintf(fp, "mon_cluster_file   mon_cluster.dat\n");
     fprintf(fp, "log_file   log.dat\n");
     fprintf(fp, "\n");
     fprintf(fp, "randseed 0    #(0=time)\n");

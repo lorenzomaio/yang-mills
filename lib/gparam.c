@@ -422,8 +422,8 @@ void readinput(char *in_file, GParam *param)
                     }
                   strcpy(param->d_data_file, temp_str);
                   }
-	   // MONOPOLES file
-	   else if(strncmp(str, "mon_file", 8)==0)
+	         // MONOPOLES file
+	         else if(strncmp(str, "mon_file", 8)==0)
                   { 
                   err=fscanf(input, "%s", temp_str);
                   if(err!=1)
@@ -432,6 +432,16 @@ void readinput(char *in_file, GParam *param)
                     exit(EXIT_FAILURE);
                     }
                   strcpy(param->d_mon_file, temp_str);
+                  }
+           else if(strncmp(str, "mon_cluster_file", 16)==0)
+                  { 
+                  err=fscanf(input, "%s", temp_str);
+                  if(err!=1)
+                    {
+                    fprintf(stderr, "Error in reading the file %s (%s, %d)\n", in_file, __FILE__, __LINE__);
+                    exit(EXIT_FAILURE);
+                    }
+                  strcpy(param->d_mon_cluster_file, temp_str);
                   }
            else if(strncmp(str, "log_file", 8)==0)
                   { 
@@ -639,6 +649,42 @@ void init_mon_file(FILE **monof, GParam const * const param)
   fflush(*monof);
   }
 
+// initialize monopoles cluster file
+void init_mon_cluster_file(FILE **monoclf, GParam const * const param)
+  {
+  int i;
+
+  if(param->d_start==2)
+    {
+    *monoclf=fopen(param->d_mon_cluster_file, "r");
+    if(*monoclf!=NULL) // file exists
+      {
+      fclose(*monoclf);
+      *monoclf=fopen(param->d_mon_cluster_file, "a");
+      }
+    else
+      {
+      *monoclf=fopen(param->d_mon_cluster_file, "w");
+      fprintf(*monoclf, "%d ", STDIM);
+      for(i=0; i<STDIM; i++)
+         {
+         fprintf(*monoclf, "%d ", param->d_size[i]);
+         }
+      fprintf(*monoclf, "\n");
+      }
+    }
+  else
+    {
+    *monoclf=fopen(param->d_mon_cluster_file, "w");
+    fprintf(*monoclf, "%d ", STDIM);
+    for(i=0; i<STDIM; i++)
+       {
+       fprintf(*monoclf, "%d ", param->d_size[i]);
+       }
+    fprintf(*monoclf, "\n");
+    }
+  fflush(*monoclf);
+  }
 
 
 // print simulation parameters

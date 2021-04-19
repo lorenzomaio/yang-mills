@@ -838,7 +838,8 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                Geometry const * const geo,
                                GParam const * const param,
                                FILE *datafilep,
-                               FILE *monofilep)
+                               FILE *monofilep,
+                               FILE *monofileclp)
    {
    double plaqs, plaqt, polyre, polyim, mod_pol;
 
@@ -916,6 +917,7 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
 
         // compute monopole observables
         monopoles_obs(&helperconf, geo, param, subg,mod_pol, monofilep);
+        monopoles_clusters(&helperconf, geo, param, subg, monofileclp);
         }
 
      free_diag_proj_stuff(&helperconf, param);
