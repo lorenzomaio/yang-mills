@@ -227,7 +227,7 @@ int main (int argc, char **argv)
        {
        volumel*=sides[i];
        }
-
+    printf("NDIM: %d, nt: %d, nx: %d, ny: %d, nz: %d\n",dim,sides[0],sides[1],sides[2],sides[3]);
     // compute the hash
     computehash(infile, dim, volumel, md5sum_new);
 

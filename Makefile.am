@@ -114,6 +114,7 @@ everything =  $(align) \
               $(geometry) \
               $(gparam) \
               ./include/macro.h \
+              ./include/dynamical_allocations.h \
               $(son) \
               $(random) \
               $(su2) \

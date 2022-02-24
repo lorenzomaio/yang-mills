@@ -260,13 +260,15 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                GParam const * const param,
                                FILE *datafilep,
                                FILE *monofilep,
-                               FILE *monofileclp);
+                               FILE *monofileclp,
+                               FILE *coords);
 
 void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
                                              Geometry const * const geo,
                                              GParam const * const param,
                                              FILE *datafilep,
-                                             FILE *monofilep);
+                                             FILE *monofilep,
+					     FILE *coords);
 
 void perform_measures_localobs_fundadj(Gauge_Conf const * const GC,
                                        Geometry const * const geo,
@@ -322,13 +324,17 @@ void wrap_search(Gauge_Conf *GC,
                  GParam const * const param,
                  long r,
                  long r_tback,
-                 int *num_wrap);
+                 int *num_wrap,
+		 int subg,
+		 FILE *coords,
+		 size_t *postype);
 void monopoles_obs(Gauge_Conf *GC,
                    Geometry const * const geo,
                    GParam const * const param,
                    int subg,
                    double mod_pol,
-                   FILE* monofilep);
+                   FILE* monofilep,
+		   FILE *coords);
 
 void compute_cluster(Gauge_Conf *GC,
                      Geometry const * const geo,

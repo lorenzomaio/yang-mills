@@ -27,7 +27,7 @@ void real_main(char *in_file)
     char name[STD_STRING_LENGTH], aux[STD_STRING_LENGTH];
     int count;
     double acc, acc_local;
-    FILE *datafilep, *monofilep;
+    FILE *datafilep, *monofilep, *coords;
     time_t time1, time2;
 
     // to disable nested parallelism
@@ -49,6 +49,7 @@ void real_main(char *in_file)
       {
       init_mon_file(&monofilep, &param);
       }
+    coords=fopen("coords.dat","a");
 
     // initialize geometry
     init_indexing_lexeo();
@@ -70,7 +71,7 @@ void real_main(char *in_file)
 
        if(count % param.d_measevery ==0 && count >= param.d_thermal)
          {
-         perform_measures_localobs_with_tracedef(&GC, &geo, &param, datafilep, monofilep);
+	   perform_measures_localobs_with_tracedef(&GC, &geo, &param, datafilep, monofilep, coords);
          }
 
        // save configuration for backup
@@ -110,6 +111,7 @@ void real_main(char *in_file)
     if(param.d_mon_meas == 1)
       {
       fclose(monofilep);
+      fclose(coords);
       }
 
     // save configuration

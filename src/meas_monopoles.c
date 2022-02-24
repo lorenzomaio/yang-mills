@@ -19,7 +19,7 @@ int main(int argc, char **argv)
    GParam param;
    Gauge_Conf GC;
    Geometry geo;
-   FILE*fp, *datafilep, *monofilep, *cluster_monofilep;
+   FILE*fp, *datafilep, *monofilep, *cluster_monofilep, *coords;
    int dim, err, i;
 
    if(argc != 2)
@@ -90,6 +90,7 @@ int main(int argc, char **argv)
    datafilep = fopen("plaq_pol.dat", "a");
    monofilep = fopen("mon.dat", "a");
    cluster_monofilep = fopen("mon_clusters.dat", "a");
+   coords = fopen("coords.dat", "a");
 
    // compute the Polyakov observables
    double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1], mod_loc, aux;
@@ -137,7 +138,7 @@ int main(int argc, char **argv)
 
       U1_extract(&helperconf, &param, subg);
       // compute monopole observables
-      monopoles_obs(&helperconf, &geo, &param, subg, aux, monofilep);
+      monopoles_obs(&helperconf, &geo, &param, subg, aux, monofilep, coords);
 
       // compute the cluster of monopoles currents.
       monopoles_clusters(&helperconf, &geo, &param, subg, cluster_monofilep);
@@ -148,7 +149,10 @@ int main(int argc, char **argv)
 
       fflush(monofilep);
       fclose(monofilep);
-
+      
+      fflush(coords);
+      fclose(coords);
+            
       free_gauge_conf(&GC, &param);
       free_geometry(&geo, &param);
 

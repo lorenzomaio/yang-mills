@@ -8,6 +8,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+#include"../include/dynamical_allocations.h"
 #include"../include/flavour_matrix.h"
 #include"../include/gparam.h"
 #include"../include/function_pointers.h"
@@ -22,28 +23,28 @@
 
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
 double plaquettep(Gauge_Conf const * const GC,
-                  Geometry const * const geo,
-                  GParam const * const param,
-                  long r,
-                  int i,
-                  int j)
-   {
-   GAUGE_GROUP matrix;
+		    Geometry const * const geo,
+		    GParam const * const param,
+		    long r,
+		    int i,
+		    int j)
+{
+GAUGE_GROUP matrix;
 
-   #ifdef DEBUG
-   if(r >= param->d_volume)
-     {
-     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   if(j >= STDIM || i >= STDIM)
-     {
-     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #else
-   (void) param; // just to avoid warning at compile time
-   #endif
+#ifdef DEBUG
+if(r >= param->d_volume)
+  {
+fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+exit(EXIT_FAILURE);
+}
+if(j >= STDIM || i >= STDIM)
+  {
+fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
+exit(EXIT_FAILURE);
+}
+#else
+(void) param; // just to avoid warning at compile time
+#endif
 
 //
 //       ^ i
@@ -56,39 +57,39 @@ double plaquettep(Gauge_Conf const * const GC,
 //       r   (4)
 //
 
-   equal(&matrix, &(GC->lattice[nnp(geo, r, j)][i]));
-   times_equal_dag(&matrix, &(GC->lattice[nnp(geo, r, i)][j]));
-   times_equal_dag(&matrix, &(GC->lattice[r][i]));
-   times_equal(&matrix, &(GC->lattice[r][j]));
+equal(&matrix, &(GC->lattice[nnp(geo, r, j)][i]));
+times_equal_dag(&matrix, &(GC->lattice[nnp(geo, r, i)][j]));
+times_equal_dag(&matrix, &(GC->lattice[r][i]));
+times_equal(&matrix, &(GC->lattice[r][j]));
 
-   return retr(&matrix);
-   }
+return retr(&matrix);
+}
 
 
 // computation of the plaquette (1/NCOLOR the trace of) in position r and positive directions i,j
 double complex plaquettep_complex(Gauge_Conf const * const GC,
-                                  Geometry const * const geo,
-                                  GParam const * const param,
-                                  long r,
-                                  int i,
-                                  int j)
-   {
-   GAUGE_GROUP matrix;
+				    Geometry const * const geo,
+				    GParam const * const param,
+				    long r,
+				    int i,
+				    int j)
+{
+GAUGE_GROUP matrix;
 
-   #ifdef DEBUG
-   if(r >= param->d_volume)
-     {
-     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   if(j >= STDIM || i >= STDIM)
-     {
-     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #else
-   (void) param; // just to avoid warning at compile time
-   #endif
+#ifdef DEBUG
+if(r >= param->d_volume)
+  {
+fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+exit(EXIT_FAILURE);
+}
+if(j >= STDIM || i >= STDIM)
+  {
+fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
+exit(EXIT_FAILURE);
+}
+#else
+(void) param; // just to avoid warning at compile time
+#endif
 
 //
 //       ^ i
@@ -101,38 +102,38 @@ double complex plaquettep_complex(Gauge_Conf const * const GC,
 //       r   (4)
 //
 
-   equal(&matrix, &(GC->lattice[nnp(geo, r, j)][i]));
-   times_equal_dag(&matrix, &(GC->lattice[nnp(geo, r, i)][j]));
-   times_equal_dag(&matrix, &(GC->lattice[r][i]));
-   times_equal(&matrix, &(GC->lattice[r][j]));
+equal(&matrix, &(GC->lattice[nnp(geo, r, j)][i]));
+times_equal_dag(&matrix, &(GC->lattice[nnp(geo, r, i)][j]));
+times_equal_dag(&matrix, &(GC->lattice[r][i]));
+times_equal(&matrix, &(GC->lattice[r][j]));
 
-   return retr(&matrix)+I*imtr(&matrix);
-   }
+return retr(&matrix)+I*imtr(&matrix);
+}
 
 
 // computation of the plaquette (matrix) in position r and positive directions i,j
 void plaquettep_matrix(Gauge_Conf const * const GC,
-                       Geometry const * const geo,
-                       GParam const * const param,
-                       long r,
-                       int i,
-                       int j,
-                       GAUGE_GROUP *matrix)
-   {
-   #ifdef DEBUG
-   if(r >= param->d_volume)
-     {
-     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   if(j >= STDIM || i >= STDIM)
-     {
-     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #else
-   (void) param; // just to avoid warning at compile time
-   #endif
+			 Geometry const * const geo,
+			 GParam const * const param,
+			 long r,
+			 int i,
+			 int j,
+			 GAUGE_GROUP *matrix)
+{
+#ifdef DEBUG
+if(r >= param->d_volume)
+  {
+fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+exit(EXIT_FAILURE);
+}
+if(j >= STDIM || i >= STDIM)
+  {
+fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
+exit(EXIT_FAILURE);
+}
+#else
+(void) param; // just to avoid warning at compile time
+#endif
 
 //
 //       ^ j
@@ -145,41 +146,41 @@ void plaquettep_matrix(Gauge_Conf const * const GC,
 //       r   (1)
 //
 
-   equal(matrix, &(GC->lattice[r][i]));
-   times_equal(matrix, &(GC->lattice[nnp(geo, r, i)][j]));
-   times_equal_dag(matrix, &(GC->lattice[nnp(geo, r, j)][i]));
-   times_equal_dag(matrix, &(GC->lattice[r][j]));
-   }
+equal(matrix, &(GC->lattice[r][i]));
+times_equal(matrix, &(GC->lattice[nnp(geo, r, i)][j]));
+times_equal_dag(matrix, &(GC->lattice[nnp(geo, r, j)][i]));
+times_equal_dag(matrix, &(GC->lattice[r][j]));
+}
 
 
 // compute the four-leaf clover in position r, in the plane i,j and save it in M
 void clover(Gauge_Conf const * const GC,
-            Geometry const * const geo,
-            GParam const * const param,
-            long r,
-            int i,
-            int j,
-            GAUGE_GROUP *M)
-   {
-   GAUGE_GROUP aux;
-   long k, p;
+	      Geometry const * const geo,
+	      GParam const * const param,
+	      long r,
+	      int i,
+	      int j,
+	      GAUGE_GROUP *M)
+{
+GAUGE_GROUP aux;
+long k, p;
 
-   #ifdef DEBUG
-   if(r >= param->d_volume)
-     {
-     fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   if(i >= STDIM || j >= STDIM)
-     {
-     fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   #else
-   (void) param;
-   #endif
+#ifdef DEBUG
+if(r >= param->d_volume)
+  {
+fprintf(stderr, "r too large: %ld >= %ld (%s, %d)\n", r, param->d_volume, __FILE__, __LINE__);
+exit(EXIT_FAILURE);
+}
+if(i >= STDIM || j >= STDIM)
+  {
+fprintf(stderr, "i or j too large: (i=%d || j=%d) >= %d (%s, %d)\n", i, j, STDIM, __FILE__, __LINE__);
+exit(EXIT_FAILURE);
+}
+#else
+(void) param;
+#endif
 
-   zero(M);
+zero(M);
 
 //
 //                   i ^
@@ -201,38 +202,38 @@ void clover(Gauge_Conf const * const GC,
 //         +------>----++----->-----+
 //              (11)   k      (6)
 //
-   // avanti-avanti
-   equal(&aux, &(GC->lattice[r][i]) );                           // 1
-   times_equal(&aux, &(GC->lattice[nnp(geo, r, i)][j]) );        // 2
-   times_equal_dag(&aux, &(GC->lattice[nnp(geo, r, j)][i]) );    // 3
-   times_equal_dag(&aux, &(GC->lattice[r][j]) );                 // 4
-   plus_equal(M, &aux);
+// avanti-avanti
+equal(&aux, &(GC->lattice[r][i]) );                           // 1
+times_equal(&aux, &(GC->lattice[nnp(geo, r, i)][j]) );        // 2
+times_equal_dag(&aux, &(GC->lattice[nnp(geo, r, j)][i]) );    // 3
+times_equal_dag(&aux, &(GC->lattice[r][j]) );                 // 4
+plus_equal(M, &aux);
 
-   k=nnm(geo, r, j);
+k=nnm(geo, r, j);
 
-   // avanti-indietro
-   equal_dag(&aux, &(GC->lattice[k][j]) );                       // 5
-   times_equal(&aux, &(GC->lattice[k][i]) );                     // 6
-   times_equal(&aux, &(GC->lattice[nnp(geo, k, i)][j]) );        // 7
-   times_equal_dag(&aux, &(GC->lattice[r][i]) );                 // 8
-   plus_equal(M, &aux);
+// avanti-indietro
+equal_dag(&aux, &(GC->lattice[k][j]) );                       // 5
+times_equal(&aux, &(GC->lattice[k][i]) );                     // 6
+times_equal(&aux, &(GC->lattice[nnp(geo, k, i)][j]) );        // 7
+times_equal_dag(&aux, &(GC->lattice[r][i]) );                 // 8
+plus_equal(M, &aux);
 
-   p=nnm(geo, r, i);
+p=nnm(geo, r, i);
 
-   // indietro-indietro
-   equal_dag(&aux, &(GC->lattice[p][i]) );                       // 9
-   times_equal_dag(&aux, &(GC->lattice[nnm(geo, k, i)][j]) );    // 10
-   times_equal(&aux, &(GC->lattice[nnm(geo, k, i)][i]) );        // 11
-   times_equal(&aux, &(GC->lattice[k][j]) );                     // 12
-   plus_equal(M, &aux);
+// indietro-indietro
+equal_dag(&aux, &(GC->lattice[p][i]) );                       // 9
+times_equal_dag(&aux, &(GC->lattice[nnm(geo, k, i)][j]) );    // 10
+times_equal(&aux, &(GC->lattice[nnm(geo, k, i)][i]) );        // 11
+times_equal(&aux, &(GC->lattice[k][j]) );                     // 12
+plus_equal(M, &aux);
 
-   // indietro-avanti
-   equal(&aux, &(GC->lattice[r][j]) );                            // 13
-   times_equal_dag(&aux, &(GC->lattice[nnp(geo, p, j)][i]) );     // 14
-   times_equal_dag(&aux, &(GC->lattice[p][j]) );                  // 15
-   times_equal(&aux, &(GC->lattice[p][i]) );                      // 16
-   plus_equal(M, &aux);
-   }
+// indietro-avanti
+equal(&aux, &(GC->lattice[r][j]) );                            // 13
+times_equal_dag(&aux, &(GC->lattice[nnp(geo, p, j)][i]) );     // 14
+times_equal_dag(&aux, &(GC->lattice[p][j]) );                  // 15
+times_equal(&aux, &(GC->lattice[p][i]) );                      // 16
+plus_equal(M, &aux);
+}
 
 
 // compute the mean plaquettes (spatial, temporal)
@@ -241,50 +242,50 @@ void plaquette(Gauge_Conf const * const GC,
                GParam const * const param,
                double *plaqs,
                double *plaqt)
+{
+long r;
+ double ps, pt;
+
+ ps=0.0;
+ pt=0.0;
+
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : pt) reduction(+ : ps)
+#endif
+ for(r=0; r<(param->d_volume); r++)
    {
-   long r;
-   double ps, pt;
-
-   ps=0.0;
-   pt=0.0;
-
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : pt) reduction(+ : ps)
-   #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
-      int i, j;
-      i=0;
-      for(j=1; j<STDIM; j++)
-         {
+     int i, j;
+     i=0;
+     for(j=1; j<STDIM; j++)
+       {
          pt+=plaquettep(GC, geo, param, r, i, j);
-         }
+       }
      
-      for(i=1; i<STDIM; i++)
-         {
+     for(i=1; i<STDIM; i++)
+       {
          for(j=i+1; j<STDIM; j++)
-            {
-            ps+=plaquettep(GC, geo, param, r, i, j);
-            }
-         }
-      }
+	   {
+	     ps+=plaquettep(GC, geo, param, r, i, j);
+	   }
+       }
+   }
 
-   if(STDIM>2)
-     {
+ if(STDIM>2)
+   {
      ps*=param->d_inv_vol;
      ps/=((double) (STDIM-1)*(STDIM-2)/2);
-     }
-   else
-     {
-     ps=0.0;
-     }
-
-   pt*=param->d_inv_vol;
-   pt/=((double) STDIM-1);
-
-   *plaqs=ps;
-   *plaqt=pt;
    }
+ else
+   {
+     ps=0.0;
+   }
+
+ pt*=param->d_inv_vol;
+ pt/=((double) STDIM-1);
+
+ *plaqs=ps;
+ *plaqt=pt;
+}
 
 
 // compute the mean plaquettes (spatial, temporal) in fundamental and adjoint rep.
@@ -295,53 +296,53 @@ void plaquette_fundadj(Gauge_Conf const * const GC,
                        double *plaqtf,
                        double *plaqsa,
                        double *plaqta)
-   {
-   #if NCOLOR==1
-     fprintf(stderr, "Computing the adjoint plaquette in U(1) is meaningless (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
+{
+#if NCOLOR==1
+  fprintf(stderr, "Computing the adjoint plaquette in U(1) is meaningless (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
 
-     // just to avoid warnings
-     (void) GC;
-     (void) geo;
-     (void) param;
-     (void) plaqsf;
-     (void) plaqtf;
-     (void) plaqsa;
-     (void) plaqta;
-   #else
-     long r;
-     double pfs, pft, pas, pat;
+  // just to avoid warnings
+  (void) GC;
+  (void) geo;
+  (void) param;
+  (void) plaqsf;
+  (void) plaqtf;
+  (void) plaqsa;
+  (void) plaqta;
+#else
+  long r;
+  double pfs, pft, pas, pat;
 
-     pfs=0.0;
-     pft=0.0;
-     pas=0.0;
-     pat=0.0;
+  pfs=0.0;
+  pft=0.0;
+  pas=0.0;
+  pat=0.0;
 
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : pfs) reduction(+ : pft) reduction(+ : pas) reduction(+ : pat)
-     #endif
-     for(r=0; r<(param->d_volume); r++)
-        {
-        GAUGE_GROUP matrix;
-        double rtr, itr;
-        int i, j;
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : pfs) reduction(+ : pft) reduction(+ : pas) reduction(+ : pat)
+#endif
+  for(r=0; r<(param->d_volume); r++)
+    {
+      GAUGE_GROUP matrix;
+      double rtr, itr;
+      int i, j;
 
-        i=0;
-        for(j=1; j<STDIM; j++)
-           {
-           plaquettep_matrix(GC, geo, param, r, i, j, &matrix);
+      i=0;
+      for(j=1; j<STDIM; j++)
+	{
+	  plaquettep_matrix(GC, geo, param, r, i, j, &matrix);
 
-           rtr=retr(&matrix);
-           itr=imtr(&matrix);
+	  rtr=retr(&matrix);
+	  itr=imtr(&matrix);
 
-           pft+=rtr;
-           pat+=(NCOLOR*NCOLOR*(rtr*rtr+itr*itr)-1)/(NCOLOR*NCOLOR-1);
-           }
+	  pft+=rtr;
+	  pat+=(NCOLOR*NCOLOR*(rtr*rtr+itr*itr)-1)/(NCOLOR*NCOLOR-1);
+	}
 
-        for(i=1; i<STDIM; i++)
-           {
-           for(j=i+1; j<STDIM; j++)
-              {
+      for(i=1; i<STDIM; i++)
+	{
+	  for(j=i+1; j<STDIM; j++)
+	    {
               plaquettep_matrix(GC, geo, param, r, i, j, &matrix);
 
               rtr=retr(&matrix);
@@ -349,37 +350,37 @@ void plaquette_fundadj(Gauge_Conf const * const GC,
 
               pfs+=rtr;
               pas+=(NCOLOR*NCOLOR*(rtr*rtr+itr*itr)-1)/(NCOLOR*NCOLOR-1);
-              }
-           }
-        }
+	    }
+	}
+    }
 
-     if(STDIM>2)
-       {
-       pfs*=param->d_inv_vol;
-       pfs/=((double) (STDIM-1)*(STDIM-2)/2);
+  if(STDIM>2)
+    {
+      pfs*=param->d_inv_vol;
+      pfs/=((double) (STDIM-1)*(STDIM-2)/2);
 
-       pas*=param->d_inv_vol;
-       pas/=((double) (STDIM-1)*(STDIM-2)/2);
-       }
-     else
-       {
-       pfs=0.0;
-       pas=0.0;
-       }
+      pas*=param->d_inv_vol;
+      pas/=((double) (STDIM-1)*(STDIM-2)/2);
+    }
+  else
+    {
+      pfs=0.0;
+      pas=0.0;
+    }
 
-     pft*=param->d_inv_vol;
-     pft/=((double) STDIM-1);
+  pft*=param->d_inv_vol;
+  pft/=((double) STDIM-1);
 
-     pat*=param->d_inv_vol;
-     pat/=((double) STDIM-1);
+  pat*=param->d_inv_vol;
+  pat/=((double) STDIM-1);
 
-     *plaqsf=pfs;
-     *plaqtf=pft;
+  *plaqsf=pfs;
+  *plaqtf=pft;
 
-     *plaqsa=pas;
-     *plaqta=pat;
-   #endif
-   }
+  *plaqsa=pas;
+  *plaqta=pat;
+#endif
+}
 
 
 // compute the clover discretization of
@@ -388,36 +389,36 @@ void clover_disc_energy(Gauge_Conf const * const GC,
                         Geometry const * const geo,
                         GParam const * const param,
                         double *energy)
-  {
+{
   long r;
   double ris;
 
   ris=0.0;
 
-  #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
-  #endif
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
+#endif
   for(r=0; r<param->d_volume; r++)
-     {
-     int i, j;
-     GAUGE_GROUP aux1, aux2;
+    {
+      int i, j;
+      GAUGE_GROUP aux1, aux2;
 
-     for(i=0; i<STDIM; i++)
+      for(i=0; i<STDIM; i++)
         {
-        for(j=i+1; j<STDIM; j++)
-           {
-           clover(GC, geo, param, r, i, j, &aux1);
+	  for(j=i+1; j<STDIM; j++)
+	    {
+	      clover(GC, geo, param, r, i, j, &aux1);
 
-           ta(&aux1);
-           equal(&aux2, &aux1);
-           times_equal(&aux1, &aux2);
-           ris+=-NCOLOR*retr(&aux1)/16.0;
-           }
+	      ta(&aux1);
+	      equal(&aux2, &aux1);
+	      times_equal(&aux1, &aux2);
+	      ris+=-NCOLOR*retr(&aux1)/16.0;
+	    }
         }
-     }
+    }
 
   *energy=ris*param->d_inv_vol;
-  }
+}
 
 
 // compute the mean Polyakov loop (the trace of)
@@ -427,21 +428,21 @@ void polyakov_loc_fluct(Gauge_Conf const * const GC,
                         double *repoly,
                         double *impoly,
                         double *mod_local)
-   {
-   long rsp;
-   double rep, imp, mod;
+{
+  long rsp;
+  double rep, imp, mod;
 
-   rep=0.0;
-   imp=0.0;
+  rep=0.0;
+  imp=0.0;
    
 
-   mod=0.0;
+  mod=0.0;
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(rsp) reduction(+ : rep) reduction(+ : imp) reduction(+ : rep_loc) reduction(+ : imp_loc)
-   #endif
-   for(rsp=0; rsp<param->d_space_vol; rsp++)
-      {
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(rsp) reduction(+ : rep) reduction(+ : imp) reduction(+ : rep_loc) reduction(+ : imp_loc)
+#endif
+  for(rsp=0; rsp<param->d_space_vol; rsp++)
+    {
       long r;
       int i;
       GAUGE_GROUP matrix;
@@ -451,22 +452,22 @@ void polyakov_loc_fluct(Gauge_Conf const * const GC,
       one(&matrix);
 
       for(i=0; i<param->d_size[0]; i++)
-         {
-         times_equal(&matrix, &(GC->lattice[r][0]));
-         r=nnp(geo, r, 0);
-		 }
+	{
+	  times_equal(&matrix, &(GC->lattice[r][0]));
+	  r=nnp(geo, r, 0);
+	}
    
       rep+=retr(&matrix);
       imp+=imtr(&matrix);
 
       mod+=NCOLOR*sqrt(pow(retr(&matrix),2) + pow(imtr(&matrix),2));
-      }
+    }
 
-   *repoly=rep*param->d_inv_space_vol;
-   *impoly=imp*param->d_inv_space_vol;
+  *repoly=rep*param->d_inv_space_vol;
+  *impoly=imp*param->d_inv_space_vol;
 
-   *mod_local=mod*param->d_inv_space_vol;
-   }
+  *mod_local=mod*param->d_inv_space_vol;
+}
 
 // compute the mean Polyakov loop (the trace of)
 void polyakov(Gauge_Conf const * const GC,
@@ -474,18 +475,18 @@ void polyakov(Gauge_Conf const * const GC,
               GParam const * const param,
               double *repoly,
               double *impoly)
-   {
-   long rsp;
-   double rep, imp;
+{
+  long rsp;
+  double rep, imp;
 
-   rep=0.0;
-   imp=0.0;
+  rep=0.0;
+  imp=0.0;
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(rsp) reduction(+ : rep) reduction(+ : imp)
-   #endif
-   for(rsp=0; rsp<param->d_space_vol; rsp++)
-      {
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(rsp) reduction(+ : rep) reduction(+ : imp)
+#endif
+  for(rsp=0; rsp<param->d_space_vol; rsp++)
+    {
       long r;
       int i;
       GAUGE_GROUP matrix;
@@ -494,18 +495,18 @@ void polyakov(Gauge_Conf const * const GC,
 
       one(&matrix);
       for(i=0; i<param->d_size[0]; i++)
-         {
-         times_equal(&matrix, &(GC->lattice[r][0]));
-         r=nnp(geo, r, 0);
-         }
+	{
+	  times_equal(&matrix, &(GC->lattice[r][0]));
+	  r=nnp(geo, r, 0);
+	}
 
       rep+=retr(&matrix);
       imp+=imtr(&matrix);
-      }
+    }
 
-   *repoly=rep*param->d_inv_space_vol;
-   *impoly=imp*param->d_inv_space_vol;
-   }
+  *repoly=rep*param->d_inv_space_vol;
+  *impoly=imp*param->d_inv_space_vol;
+}
 
 
 // compute the mean Polyakov loop in the adjoint representation (the trace of)
@@ -514,19 +515,19 @@ void polyakov_adj(Gauge_Conf const * const GC,
                   GParam const * const param,
                   double *repoly,
                   double *impoly)
-   {
-   long rsp;
-   double rep, imp;
-   double complex tr;
+{
+  long rsp;
+  double rep, imp;
+  double complex tr;
 
-   rep=0.0;
-   imp=0.0;
+  rep=0.0;
+  imp=0.0;
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(rsp) reduction(+ : rep) reduction(+ : imp)
-   #endif
-   for(rsp=0; rsp<param->d_space_vol; rsp++)
-      {
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(rsp) reduction(+ : rep) reduction(+ : imp)
+#endif
+  for(rsp=0; rsp<param->d_space_vol; rsp++)
+    {
       long r;
       int i;
       GAUGE_GROUP matrix;
@@ -535,89 +536,89 @@ void polyakov_adj(Gauge_Conf const * const GC,
 
       one(&matrix);
       for(i=0; i<param->d_size[0]; i++)
-         {
-         times_equal(&matrix, &(GC->lattice[r][0]));
-         r=nnp(geo, r, 0);
-         }
+	{
+	  times_equal(&matrix, &(GC->lattice[r][0]));
+	  r=nnp(geo, r, 0);
+	}
       tr=NCOLOR*retr(&matrix)+NCOLOR*imtr(&matrix)*I;
 
-      #if NCOLOR==1
-        (void) tr;
-        rep+=0.0;
-      #else
-        rep+=(cabs(tr)*cabs(tr)-1)/(NCOLOR*NCOLOR-1);
-      #endif
+#if NCOLOR==1
+      (void) tr;
+      rep+=0.0;
+#else
+      rep+=(cabs(tr)*cabs(tr)-1)/(NCOLOR*NCOLOR-1);
+#endif
 
       imp+=0.0;
-      }
+    }
 
-   *repoly=rep*param->d_inv_space_vol;
-   *impoly=imp*param->d_inv_space_vol;
-   }
+  *repoly=rep*param->d_inv_space_vol;
+  *impoly=imp*param->d_inv_space_vol;
+}
 
 
 // compute the mean Polyakov loop and its powers (trace of) in the presence of trace deformation
 void polyakov_for_tracedef(Gauge_Conf const * const GC,
-                            Geometry const * const geo,
-                            GParam const * const param,
-                            double *repoly,
-                            double *impoly)
-   {
-   long rsp;
-   double **rep, **imp;
-   int j, err;
-   long i;
+			   Geometry const * const geo,
+			   GParam const * const param,
+			   double *repoly,
+			   double *impoly)
+{
+  long rsp;
+  double **rep, **imp;
+  int j, err;
+  long i;
 
-   for(j=0;j<(int)floor(NCOLOR/2);j++)
-      {
+  for(j=0;j<(int)floor(NCOLOR/2);j++)
+    {
       repoly[j]=0.0;
       impoly[j]=0.0;
-      }
+    }
 
-   err=posix_memalign((void**)&rep, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double*));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
-   err=posix_memalign((void**)&imp, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double*));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
+  err=posix_memalign((void**)&rep, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double*));
+  if(err!=0)
+    {
+      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
+  err=posix_memalign((void**)&imp, (size_t)DOUBLE_ALIGN, (size_t) param->d_space_vol * sizeof(double*));
+  if(err!=0)
+    {
+      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
 
-   for(i=0; i<param->d_space_vol; i++)
-      {
+  for(i=0; i<param->d_space_vol; i++)
+    {
       err=posix_memalign((void**)&(rep[i]), (size_t)DOUBLE_ALIGN, (size_t) (int)floor(NCOLOR/2) * sizeof(double));
       if(err!=0)
         {
-        fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-        exit(EXIT_FAILURE);
+	  fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+	  exit(EXIT_FAILURE);
         }
       err=posix_memalign((void**)&(imp[i]), (size_t)DOUBLE_ALIGN, (size_t) (int)floor(NCOLOR/2) * sizeof(double));
       if(err!=0)
         {
-        fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-        exit(EXIT_FAILURE);
+	  fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+	  exit(EXIT_FAILURE);
         }
-      }
+    }
 
-   for(i=0; i<param->d_space_vol; i++)
-      {
+  for(i=0; i<param->d_space_vol; i++)
+    {
       for(j=0; j<(int)floor(NCOLOR/2); j++)
-         {
-         rep[i][j] = 0.0;
-         imp[i][j] = 0.0;
-         }
-      }
+	{
+	  rep[i][j] = 0.0;
+	  imp[i][j] = 0.0;
+	}
+    }
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(rsp)
-   #endif
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(rsp)
+#endif
 
-   for(rsp=0; rsp<param->d_space_vol; rsp++)
-      {
+  for(rsp=0; rsp<param->d_space_vol; rsp++)
+    {
       long r;
       int k;
       GAUGE_GROUP matrix, matrix2;
@@ -626,47 +627,47 @@ void polyakov_for_tracedef(Gauge_Conf const * const GC,
 
       one(&matrix);
       for(k=0; k<param->d_size[0]; k++)
-         {
-         times_equal(&matrix, &(GC->lattice[r][0]));
-         r=nnp(geo, r, 0);
-         }
+	{
+	  times_equal(&matrix, &(GC->lattice[r][0]));
+	  r=nnp(geo, r, 0);
+	}
 
-       rep[rsp][0] = retr(&matrix);
-       imp[rsp][0] = imtr(&matrix);
+      rep[rsp][0] = retr(&matrix);
+      imp[rsp][0] = imtr(&matrix);
 
-       equal(&matrix2, &matrix);
+      equal(&matrix2, &matrix);
 
       for(k=1; k<(int)floor(NCOLOR/2.0); k++)
-         {
-         times_equal(&matrix2, &matrix);
-         rep[rsp][k] = retr(&matrix2);
-         imp[rsp][k] = imtr(&matrix2);
-         }
-      }
+	{
+	  times_equal(&matrix2, &matrix);
+	  rep[rsp][k] = retr(&matrix2);
+	  imp[rsp][k] = imtr(&matrix2);
+	}
+    }
 
-    for(j=0; j<(int)floor(NCOLOR/2); j++)
-       {
-       for(i=0; i<param->d_space_vol; i++)
-          {
+  for(j=0; j<(int)floor(NCOLOR/2); j++)
+    {
+      for(i=0; i<param->d_space_vol; i++)
+	{
           repoly[j] += rep[i][j];
           impoly[j] += imp[i][j];
-          }
-       }
+	}
+    }
 
-   for(j=0; j<(int)floor(NCOLOR/2.0); j++)
-      {
+  for(j=0; j<(int)floor(NCOLOR/2.0); j++)
+    {
       repoly[j] *= param->d_inv_space_vol;
       impoly[j] *= param->d_inv_space_vol;
-      }
+    }
 
-   for(i=0; i<param->d_space_vol; i++)
-      {
+  for(i=0; i<param->d_space_vol; i++)
+    {
       free(rep[i]);
       free(imp[i]);
-      }
-   free(rep);
-   free(imp);
-   }
+    }
+  free(rep);
+  free(imp);
+}
 
 
 // compute the local topological charge at point r
@@ -675,73 +676,73 @@ double loc_topcharge(Gauge_Conf const * const GC,
                      Geometry const * const geo,
                      GParam const * const param,
                      long r)
-   {
-   if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
-     {
-     (void) GC;
-     (void) geo;
-     (void) param;
-     (void) r;
-     fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
+{
+  if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
+    {
+      (void) GC;
+      (void) geo;
+      (void) param;
+      (void) r;
+      fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
 
-   double ris=0.0; // initialized just to avoid compiler warnings
+  double ris=0.0; // initialized just to avoid compiler warnings
 
-   #if (STDIM==4 && NCOLOR>1)
-     GAUGE_GROUP aux1, aux2, aux3;
-     double real1, real2, loc_charge;
-     const double chnorm=1.0/(128.0*PI*PI);
-     int i, dir[4][3], sign;
+#if (STDIM==4 && NCOLOR>1)
+  GAUGE_GROUP aux1, aux2, aux3;
+  double real1, real2, loc_charge;
+  const double chnorm=1.0/(128.0*PI*PI);
+  int i, dir[4][3], sign;
 
-     dir[0][0] = 0;
-     dir[0][1] = 0;
-     dir[0][2] = 0;
+  dir[0][0] = 0;
+  dir[0][1] = 0;
+  dir[0][2] = 0;
 
-     dir[1][0] = 1;
-     dir[1][1] = 2;
-     dir[1][2] = 3;
+  dir[1][0] = 1;
+  dir[1][1] = 2;
+  dir[1][2] = 3;
 
-     dir[2][0] = 2;
-     dir[2][1] = 1;
-     dir[2][2] = 1;
+  dir[2][0] = 2;
+  dir[2][1] = 1;
+  dir[2][2] = 1;
 
-     dir[3][0] = 3;
-     dir[3][1] = 3;
-     dir[3][2] = 2;
+  dir[3][0] = 3;
+  dir[3][1] = 3;
+  dir[3][2] = 2;
 
-     sign=-1;
-     loc_charge=0.0;
+  sign=-1;
+  loc_charge=0.0;
 
-     for(i=0; i<3; i++)
-        {
-        clover(GC, geo, param, r, dir[0][i], dir[1][i], &aux1);
-        clover(GC, geo, param, r, dir[2][i], dir[3][i], &aux2);
+  for(i=0; i<3; i++)
+    {
+      clover(GC, geo, param, r, dir[0][i], dir[1][i], &aux1);
+      clover(GC, geo, param, r, dir[2][i], dir[3][i], &aux2);
 
-        times_dag2(&aux3, &aux2, &aux1); // aux3=aux2*(aux1^{dag})
-        real1=retr(&aux3)*NCOLOR;
+      times_dag2(&aux3, &aux2, &aux1); // aux3=aux2*(aux1^{dag})
+      real1=retr(&aux3)*NCOLOR;
 
-        times(&aux3, &aux2, &aux1); // aux3=aux2*aux1
-        real2=retr(&aux3)*NCOLOR;
+      times(&aux3, &aux2, &aux1); // aux3=aux2*aux1
+      real2=retr(&aux3)*NCOLOR;
 
-        loc_charge+=((double) sign*(real1-real2));
-        sign=-sign;
-        }
-     ris=(loc_charge*chnorm);
-   #endif
+      loc_charge+=((double) sign*(real1-real2));
+      sign=-sign;
+    }
+  ris=(loc_charge*chnorm);
+#endif
 
-   #if (STDIM==2 && NCOLOR==1)
-     GAUGE_GROUP u1matrix;
-     double angle;
+#if (STDIM==2 && NCOLOR==1)
+  GAUGE_GROUP u1matrix;
+  double angle;
 
-     plaquettep_matrix(GC, geo, param, r, 0, 1, &u1matrix);
-     angle=atan2(cimag(u1matrix.comp), creal(u1matrix.comp))/PI2;
+  plaquettep_matrix(GC, geo, param, r, 0, 1, &u1matrix);
+  angle=atan2(cimag(u1matrix.comp), creal(u1matrix.comp))/PI2;
 
-     ris=angle;
-   #endif
+  ris=angle;
+#endif
 
-   return ris;
-   }
+  return ris;
+}
 
 
 // compute the topological charge
@@ -749,28 +750,28 @@ double loc_topcharge(Gauge_Conf const * const GC,
 double topcharge(Gauge_Conf const * const GC,
                  Geometry const * const geo,
                  GParam const * const param)
-   {
-   if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
-     {
-     fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
+{
+  if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
+    {
+      fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
 
-   double ris;
-   long r;
+  double ris;
+  long r;
 
-   ris=0.0;
+  ris=0.0;
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
-   #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
+#endif
+  for(r=0; r<(param->d_volume); r++)
+    {
       ris+=loc_topcharge(GC, geo, param, r);
-      }
+    }
 
-   return ris;
-   }
+  return ris;
+}
 
 
 // compute GParam::d_nummeas values of the topological charge after some cooling
@@ -780,58 +781,58 @@ void topcharge_cooling(Gauge_Conf const * const GC,
                        GParam const * const param,
                        double *charge,
                        double *meanplaq)
-   {
-   if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
-     {
-     fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
+{
+  if(!(STDIM==4 && NCOLOR>1) && !(STDIM==2 && NCOLOR==1) )
+    {
+      fprintf(stderr, "Wrong number of dimensions or number of colors! (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
 
-   if(param->d_coolsteps>0)  // if using cooling
-     {  
-     Gauge_Conf helperconf; 
-     double ris, plaqs, plaqt;
-     int iter;
+  if(param->d_coolsteps>0)  // if using cooling
+    {  
+      Gauge_Conf helperconf; 
+      double ris, plaqs, plaqt;
+      int iter;
 
-     init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
-     // helperconf is a copy of the configuration
+      init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+      // helperconf is a copy of the configuration
   
-     for(iter=0; iter<(param->d_coolrepeat); iter++)
+      for(iter=0; iter<(param->d_coolrepeat); iter++)
         {
-        cooling(&helperconf, geo, param, param->d_coolsteps);
+	  cooling(&helperconf, geo, param, param->d_coolsteps);
 
-        ris=topcharge(&helperconf, geo, param);
-        charge[iter]=ris;
+	  ris=topcharge(&helperconf, geo, param);
+	  charge[iter]=ris;
 
-        plaquette(&helperconf, geo, param, &plaqs, &plaqt);
-        #if(STDIM==4)
+	  plaquette(&helperconf, geo, param, &plaqs, &plaqt);
+#if(STDIM==4)
           meanplaq[iter]=0.5*(plaqs+plaqt);
-        #else
+#else
           meanplaq[iter]=plaqt;
-        #endif
+#endif
         }
 
-     free_gauge_conf(&helperconf, param); 
-     }
-   else   // no cooling
-     {
-     double ris, plaqs, plaqt; 
-     int iter;
+      free_gauge_conf(&helperconf, param); 
+    }
+  else   // no cooling
+    {
+      double ris, plaqs, plaqt; 
+      int iter;
 
-     ris=topcharge(GC, geo, param);
-     plaquette(GC, geo, param, &plaqs, &plaqt);
+      ris=topcharge(GC, geo, param);
+      plaquette(GC, geo, param, &plaqs, &plaqt);
   
-     for(iter=0; iter<(param->d_coolrepeat); iter++)
+      for(iter=0; iter<(param->d_coolrepeat); iter++)
         {
-        charge[iter]=ris;
-        #if(STDIM==4)
+	  charge[iter]=ris;
+#if(STDIM==4)
           meanplaq[iter]=0.5*(plaqs+plaqt);
-        #else
+#else
           meanplaq[iter]=plaqt;
-        #endif
+#endif
         }
-     } 
-   }
+    } 
+}
 
 
 void perform_measures_localobs(Gauge_Conf const * const GC,
@@ -839,96 +840,97 @@ void perform_measures_localobs(Gauge_Conf const * const GC,
                                GParam const * const param,
                                FILE *datafilep,
                                FILE *monofilep,
-                               FILE *monofileclp)
-   {
-   double plaqs, plaqt, polyre, polyim, mod_pol;
+                               FILE *monofileclp,
+                               FILE *coords)
+{
+  double plaqs, plaqt, polyre, polyim, mod_pol;
 
-   plaquette(GC, geo, param, &plaqs, &plaqt);
-   polyakov(GC, geo, param, &polyre, &polyim);
+  plaquette(GC, geo, param, &plaqs, &plaqt);
+  polyakov(GC, geo, param, &polyre, &polyim);
 
 
-   fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
-   mod_pol = NCOLOR*sqrt(polyre*polyre + polyim*polyim);
+  fprintf(datafilep, "%.12g %.12g %.12g %.12g ", plaqs, plaqt, polyre, polyim);
+  mod_pol = NCOLOR*sqrt(polyre*polyre + polyim*polyim);
 
-   // topological observables
-   #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
-     int i, err;
-     double*charge, *meanplaq, charge_nocooling;
+  // topological observables
+#if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
+  int i, err;
+  double*charge, *meanplaq, charge_nocooling;
 
-     charge_nocooling=topcharge(GC, geo, param);
-     fprintf(datafilep, " %.12g ", charge_nocooling);
+  charge_nocooling=topcharge(GC, geo, param);
+  fprintf(datafilep, " %.12g ", charge_nocooling);
 
-     err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
-     if(err!=0)
-       {
-       fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-       exit(EXIT_FAILURE);
-       }
-     err=posix_memalign((void**)&meanplaq, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
-     if(err!=0)
-       {
-       fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-       exit(EXIT_FAILURE);
-       }
+  err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+  if(err!=0)
+    {
+      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
+  err=posix_memalign((void**)&meanplaq, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+  if(err!=0)
+    {
+      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
 
-     topcharge_cooling(GC, geo, param, charge, meanplaq);
-     for(i=0; i<param->d_coolrepeat; i++)
-        {
-        fprintf(datafilep, "%.12g %.12g ", charge[i], meanplaq[i]);
-        }
-     fprintf(datafilep, "\n");
+  topcharge_cooling(GC, geo, param, charge, meanplaq);
+  for(i=0; i<param->d_coolrepeat; i++)
+    {
+      fprintf(datafilep, "%.12g %.12g ", charge[i], meanplaq[i]);
+    }
+  fprintf(datafilep, "\n");
 
-     free(charge);
-     free(meanplaq);
-   #else
-     fprintf(datafilep, "\n");
-   #endif
-   fflush(datafilep);
+  free(charge);
+  free(meanplaq);
+#else
+  fprintf(datafilep, "\n");
+#endif
+  fflush(datafilep);
 
-   // monopole observables
-   if(param->d_mon_meas == 1)
-     {
-     #if STDIM==4
-     int subg, subgnum;
-     Gauge_Conf helperconf;
+  // monopole observables
+  if(param->d_mon_meas == 1)
+    {
+#if STDIM==4
+      int subg, subgnum;
+      Gauge_Conf helperconf;
 
-     init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
-     alloc_diag_proj_stuff(&helperconf, param);
+      init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+      alloc_diag_proj_stuff(&helperconf, param);
 
-     // MAG gauge fixing
-     max_abelian_gauge_fix(&helperconf, geo, param);
+      // MAG gauge fixing
+      max_abelian_gauge_fix(&helperconf, geo, param);
  
-     //diagonal projection
-     diag_projection(&helperconf, param);
+      //diagonal projection
+      diag_projection(&helperconf, param);
    
-     //loop on all the U(1) subgroups
-     if(NCOLOR>1)
-       {
-       subgnum=NCOLOR-1;
-       }
-     else
-       {
-       subgnum=1;
-       }
-     for(subg=0; subg<subgnum; subg++)
+      //loop on all the U(1) subgroups
+      if(NCOLOR>1)
+	{
+	  subgnum=NCOLOR-1;
+	}
+      else
+	{
+	  subgnum=1;
+	}
+      for(subg=0; subg<subgnum; subg++)
         {
-        // extract the abelian component subg and save it to GC->u1_subg
-        U1_extract(&helperconf, param, subg);
+	  // extract the abelian component subg and save it to GC->u1_subg
+	  U1_extract(&helperconf, param, subg);
 
-        // compute monopole observables
-        monopoles_obs(&helperconf, geo, param, subg,mod_pol, monofilep);
-        monopoles_clusters(&helperconf, geo, param, subg, monofileclp);
+	  // compute monopole observables
+	  monopoles_obs(&helperconf, geo, param, subg,mod_pol, monofilep, coords);
+	  monopoles_clusters(&helperconf, geo, param, subg, monofileclp);
         }
 
-     free_diag_proj_stuff(&helperconf, param);
-     free_gauge_conf(&helperconf, param);
+      free_diag_proj_stuff(&helperconf, param);
+      free_gauge_conf(&helperconf, param);
 
-     fflush(monofilep);
-     #else
-     (void) monofilep;
-     #endif
-     }
-   }
+      fflush(monofilep);
+#else
+      (void) monofilep;
+#endif
+    }
+}
 
 
 // perform local observables in the case of trace deformation, it computes all the order parameters
@@ -936,153 +938,154 @@ void perform_measures_localobs_with_tracedef(Gauge_Conf const * const GC,
                                              Geometry const * const geo,
                                              GParam const * const param,
                                              FILE *datafilep,
-                                             FILE *monofilep)
-   {
-   int i;
-   double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1], mod_pol; // +1 just to avoid warning if NCOLOR=1
+                                             FILE *monofilep,
+					     FILE *coords)
+{
+  int i;
+  double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1], mod_pol; // +1 just to avoid warning if NCOLOR=1
 
-   plaquette(GC, geo, param, &plaqs, &plaqt);
-   polyakov_for_tracedef(GC, geo, param, polyre, polyim);
-   mod_pol = NCOLOR*sqrt(polyre[0]*polyre[0] + polyim[0]*polyim[0]);
-   fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+  plaquette(GC, geo, param, &plaqs, &plaqt);
+  polyakov_for_tracedef(GC, geo, param, polyre, polyim);
+  mod_pol = NCOLOR*sqrt(polyre[0]*polyre[0] + polyim[0]*polyim[0]);
+  fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
 
-   for(i=0; i<(int)floor(NCOLOR/2); i++)
-      {
+  for(i=0; i<(int)floor(NCOLOR/2); i++)
+    {
       fprintf(datafilep, "%.12g %.12g ", polyre[i], polyim[i]);
-      }
+    }
 
-   // topological observables
-   #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
-     int err;
-     double *charge, *meanplaq, charge_nocooling;
+  // topological observables
+#if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
+  int err;
+  double *charge, *meanplaq, charge_nocooling;
 
-     charge_nocooling=topcharge(GC, geo, param);
+  charge_nocooling=topcharge(GC, geo, param);
 
-     fprintf(datafilep, "%.12g ", charge_nocooling);
+  fprintf(datafilep, "%.12g ", charge_nocooling);
 
-     err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
-     if(err!=0)
-       {
-       fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-       exit(EXIT_FAILURE);
-       }
-     err=posix_memalign((void**)&meanplaq, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
-     if(err!=0)
-       {
-       fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-       exit(EXIT_FAILURE);
-       }
+  err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+  if(err!=0)
+    {
+      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
+  err=posix_memalign((void**)&meanplaq, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+  if(err!=0)
+    {
+      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
 
-     topcharge_cooling(GC, geo, param, charge, meanplaq);
-     for(i=0; i<param->d_coolrepeat; i++)
+  topcharge_cooling(GC, geo, param, charge, meanplaq);
+  for(i=0; i<param->d_coolrepeat; i++)
+    {
+      fprintf(datafilep, "%.12g %.12g ", charge[i], meanplaq[i]);
+    }
+  fprintf(datafilep, "\n");
+
+  free(charge);
+  free(meanplaq);
+#else
+  fprintf(datafilep, "\n");
+#endif
+
+  fflush(datafilep);
+
+  // monopole observables
+  if(param->d_mon_meas == 1)
+    {
+#if(STDIM==4)
+      Gauge_Conf helperconf;
+      int subg, subgnum;
+
+      init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
+      alloc_diag_proj_stuff(&helperconf, param);
+
+      // MAG gauge fixing
+      max_abelian_gauge_fix(&helperconf, geo, param);
+
+      //diagonal projection
+      diag_projection(&helperconf, param);
+
+      //loop on all the U(1) subgroups
+      if(NCOLOR>1)
+	{
+	  subgnum=NCOLOR-1;
+	}
+      else
+	{
+	  subgnum=1;
+	}
+      for(subg=0; subg<subgnum; subg++)
         {
-        fprintf(datafilep, "%.12g %.12g ", charge[i], meanplaq[i]);
+	  // extract the abelian component subg and save it to GC->u1_subg
+	  U1_extract(&helperconf, param, subg);
+
+	  // compute monopole observables
+	  monopoles_obs(&helperconf, geo, param, subg, mod_pol, monofilep, coords);
         }
-     fprintf(datafilep, "\n");
+      free_diag_proj_stuff(&helperconf, param);
+      free_gauge_conf(&helperconf, param);
 
-     free(charge);
-     free(meanplaq);
-   #else
-     fprintf(datafilep, "\n");
-   #endif
-
-   fflush(datafilep);
-
-   // monopole observables
-   if(param->d_mon_meas == 1)
-     {
-     #if(STDIM==4)
-     Gauge_Conf helperconf;
-     int subg, subgnum;
-
-     init_gauge_conf_from_gauge_conf(&helperconf, GC, param);
-     alloc_diag_proj_stuff(&helperconf, param);
-
-     // MAG gauge fixing
-     max_abelian_gauge_fix(&helperconf, geo, param);
-
-     //diagonal projection
-     diag_projection(&helperconf, param);
-
-     //loop on all the U(1) subgroups
-     if(NCOLOR>1)
-       {
-       subgnum=NCOLOR-1;
-       }
-     else
-       {
-       subgnum=1;
-       }
-     for(subg=0; subg<subgnum; subg++)
-        {
-        // extract the abelian component subg and save it to GC->u1_subg
-        U1_extract(&helperconf, param, subg);
-
-        // compute monopole observables
-        monopoles_obs(&helperconf, geo, param, subg, mod_pol, monofilep);
-        }
-     free_diag_proj_stuff(&helperconf, param);
-     free_gauge_conf(&helperconf, param);
-
-     fflush(monofilep);
-     #else
-     (void) monofilep;
-     #endif
-     }
-   }
+      fflush(monofilep);
+#else
+      (void) monofilep;
+#endif
+    }
+}
 
 
 void perform_measures_localobs_fundadj(Gauge_Conf const * const GC,
                                        Geometry const * const geo,
                                        GParam const * const param,
                                        FILE *datafilep)
-   {
-   #if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
-     int i, err;
-     double plaqfs, plaqft, plaqas, plaqat, polyre, polyim, *charge, *meanplaq, charge_nocooling;
+{
+#if( (STDIM==4 && NCOLOR>1) || (STDIM==2 && NCOLOR==1) )
+  int i, err;
+  double plaqfs, plaqft, plaqas, plaqat, polyre, polyim, *charge, *meanplaq, charge_nocooling;
 
-     plaquette_fundadj(GC, geo, param, &plaqfs, &plaqft, &plaqas, &plaqat);
-     polyakov(GC, geo, param, &polyre, &polyim);
-     charge_nocooling=topcharge(GC, geo, param);
+  plaquette_fundadj(GC, geo, param, &plaqfs, &plaqft, &plaqas, &plaqat);
+  polyakov(GC, geo, param, &polyre, &polyim);
+  charge_nocooling=topcharge(GC, geo, param);
 
-     fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g %.12g %.12g ", plaqfs, plaqft, plaqas, plaqat, polyre, polyim, charge_nocooling);
+  fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g %.12g %.12g ", plaqfs, plaqft, plaqas, plaqat, polyre, polyim, charge_nocooling);
 
-     err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
-     if(err!=0)
-       {
-       fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-       exit(EXIT_FAILURE);
-       }
-     err=posix_memalign((void**)&meanplaq, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
-     if(err!=0)
-       {
-       fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
-       exit(EXIT_FAILURE);
-       }
+  err=posix_memalign((void**)&charge, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+  if(err!=0)
+    {
+      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
+  err=posix_memalign((void**)&meanplaq, (size_t)DOUBLE_ALIGN, (size_t) param->d_coolrepeat * sizeof(double));
+  if(err!=0)
+    {
+      fprintf(stderr, "Problems in allocating a vector (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
 
-     topcharge_cooling(GC, geo, param, charge, meanplaq);
-     for(i=0; i<param->d_coolrepeat; i++)
-        {
-        fprintf(datafilep, "%.12g %.12g ", charge[i], meanplaq[i]);
-        }
-     fprintf(datafilep, "\n");
+  topcharge_cooling(GC, geo, param, charge, meanplaq);
+  for(i=0; i<param->d_coolrepeat; i++)
+    {
+      fprintf(datafilep, "%.12g %.12g ", charge[i], meanplaq[i]);
+    }
+  fprintf(datafilep, "\n");
 
-     fflush(datafilep);
+  fflush(datafilep);
 
-     free(charge);
-     free(meanplaq);
+  free(charge);
+  free(meanplaq);
 
-   #else
-     double plaqfs, plaqft, plaqas, plaqat, polyre, polyim;
+#else
+  double plaqfs, plaqft, plaqas, plaqat, polyre, polyim;
 
-     plaquette_fundadj(GC, geo, param, &plaqfs, &plaqft, &plaqas, &plaqat);
-     polyakov(GC, geo, param, &polyre, &polyim);
+  plaquette_fundadj(GC, geo, param, &plaqfs, &plaqft, &plaqas, &plaqat);
+  polyakov(GC, geo, param, &polyre, &polyim);
 
-     fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g %.12g", plaqfs, plaqft, plaqas, plaqat, polyre, polyim);
-     fprintf(datafilep, "\n");
-     fflush(datafilep);
-   #endif
-   }
+  fprintf(datafilep, "%.12g %.12g %.12g %.12g %.12g %.12g", plaqfs, plaqft, plaqas, plaqat, polyre, polyim);
+  fprintf(datafilep, "\n");
+  fflush(datafilep);
+#endif
+}
 
 
 // compute the average value of \sum_{flavours} Re(H_x U_{x,mu} H_{x+mu})
@@ -1090,36 +1093,36 @@ void higgs_interaction(Gauge_Conf const * const GC,
                        Geometry const * const geo,
                        GParam const * const param,
                        double *he)
-  {
+{
   long r;
   double ris=0.0;
 
-  #ifdef OPENMP_MODE
-  #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
-  #endif
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : ris)
+#endif
   for(r=0; r<(param->d_volume); r++)
-     {
-     int i;
-     double aux=0.0;
-     GAUGE_VECS v1;
-     GAUGE_GROUP matrix;
+    {
+      int i;
+      double aux=0.0;
+      GAUGE_VECS v1;
+      GAUGE_GROUP matrix;
 
-     for(i=0; i<STDIM; i++)
+      for(i=0; i<STDIM; i++)
         {
-        equal(&matrix, &(GC->lattice[r][i]));
+	  equal(&matrix, &(GC->lattice[r][i]));
 
-        matrix_times_vector_all_vecs(&v1, &matrix, &(GC->higgs[nnp(geo, r, i)]));
-        aux+=re_scal_prod_vecs(&(GC->higgs[r]), &v1);
+	  matrix_times_vector_all_vecs(&v1, &matrix, &(GC->higgs[nnp(geo, r, i)]));
+	  aux+=re_scal_prod_vecs(&(GC->higgs[r]), &v1);
         }
 
-     ris+=aux;
-     }
+      ris+=aux;
+    }
 
   ris/=(double) STDIM;
   ris*=param->d_inv_vol;
 
   *he=ris;
-  }
+}
 
 
 // compute flavour related observables
@@ -1141,7 +1144,7 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
                                  double *tildeGminp,
                                  double *tildeD0,
                                  double *tildeDminp)
-  {
+{
   int coord[STDIM];
   long r;
   const double p = 2.0*PI/(double)param->d_size[1];
@@ -1161,22 +1164,22 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
   zero_FMatrix(&Qp);
   zero_FMatrix(&Qmp);
   for(r=0; r<(param->d_volume); r++)
-     {
-     equal_FMatrix(&tmp1, &(GC->Qh[r]));
-     equal_FMatrix(&tmp2, &tmp1);
+    {
+      equal_FMatrix(&tmp1, &(GC->Qh[r]));
+      equal_FMatrix(&tmp2, &tmp1);
 
-     plus_equal_FMatrix(&Q, &tmp1);
-     D+=(GC->Dh[r]);
+      plus_equal_FMatrix(&Q, &tmp1);
+      D+=(GC->Dh[r]);
 
-     si_to_cart(coord, r, param);
+      si_to_cart(coord, r, param);
 
-     times_equal_complex_FMatrix(&tmp1, cexp(I*((double)coord[1])*p));
-     plus_equal_FMatrix(&Qp, &tmp1);
-     Dp+=((GC->Dh[r]) * cexp(I*((double)coord[1])*p) );
+      times_equal_complex_FMatrix(&tmp1, cexp(I*((double)coord[1])*p));
+      plus_equal_FMatrix(&Qp, &tmp1);
+      Dp+=((GC->Dh[r]) * cexp(I*((double)coord[1])*p) );
 
-     times_equal_complex_FMatrix(&tmp2, cexp(-I*((double)coord[1])*p));
-     plus_equal_FMatrix(&Qmp, &tmp2);
-     }
+      times_equal_complex_FMatrix(&tmp2, cexp(-I*((double)coord[1])*p));
+      plus_equal_FMatrix(&Qmp, &tmp2);
+    }
 
   equal_FMatrix(&tmp1, &Q);
   times_equal_FMatrix(&tmp1, &Q);
@@ -1188,7 +1191,7 @@ void compute_flavour_observables(Gauge_Conf const * const GC,
   times_equal_FMatrix(&tmp1, &Qmp);
   *tildeGminp=retr_FMatrix(&tmp1)*param->d_inv_vol;
   *tildeDminp=creal(Dp*conj(Dp))*param->d_inv_vol;
-  }
+}
 
 
 // compute correlators of flavour observables
@@ -1204,150 +1207,150 @@ void compute_flavour_observables_corr(Gauge_Conf const * const GC,
                                       double *corrQQ,
                                       double *corr0string0,
                                       double *corr0string1)
-  {
+{
   int dist;
   long r;
   double accumulator1, accumulator2;
 
   for(dist=0; dist<param->d_size[1]; dist++)
-     {
-     accumulator1=0.0;
+    {
+      accumulator1=0.0;
 
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : accumulator1)
-     #endif
-     for(r=0; r<(param->d_volume); r++)
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : accumulator1)
+#endif
+      for(r=0; r<(param->d_volume); r++)
         {
-        int i;
-        long r1;
-        FMatrix tmp1;
+	  int i;
+	  long r1;
+	  FMatrix tmp1;
 
-        equal_FMatrix(&tmp1, &(GC->Qh[r]));
-        r1=r;
-        for(i=0; i<dist; i++)
-           {
-           r1=nnp(geo, r1, 1);
-           }
-        times_equal_FMatrix(&tmp1, &(GC->Qh[r1]));
-        accumulator1+=retr_FMatrix(&tmp1);
+	  equal_FMatrix(&tmp1, &(GC->Qh[r]));
+	  r1=r;
+	  for(i=0; i<dist; i++)
+	    {
+	      r1=nnp(geo, r1, 1);
+	    }
+	  times_equal_FMatrix(&tmp1, &(GC->Qh[r1]));
+	  accumulator1+=retr_FMatrix(&tmp1);
         }
-     accumulator1*=param->d_inv_vol;
-     corrQQ[dist]=accumulator1;
+      accumulator1*=param->d_inv_vol;
+      corrQQ[dist]=accumulator1;
 
-     accumulator1=0.0;
-     accumulator2=0.0;
+      accumulator1=0.0;
+      accumulator2=0.0;
 
-     #ifdef OPENMP_MODE
-     #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : accumulator1) reduction(+ : accumulator2)
-     #endif
-     for(r=0; r<(param->d_volume); r++)
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+ : accumulator1) reduction(+ : accumulator2)
+#endif
+      for(r=0; r<(param->d_volume); r++)
         {
-        int i;
-        long r1;
-        GAUGE_VECS phi1, phi2;
-        GAUGE_GROUP U;
+	  int i;
+	  long r1;
+	  GAUGE_VECS phi1, phi2;
+	  GAUGE_GROUP U;
 
-        equal_vecs(&phi1, &(GC->higgs[r]));
-        r1=r;
-        one(&U);
-        for(i=0; i<dist; i++)
-           {
-           times_equal(&U, &(GC->lattice[r1][1]));
-           r1=nnp(geo, r1, 1);
-           }
-        matrix_times_vector_all_vecs(&phi2, &U, &(GC->higgs[r1]));
-        accumulator1+=re_scal_prod_vecs(&phi1, &phi2);
-        #if NHIGGS >1
-         accumulator2+=re_scal_prod_single_vecs(&phi1, &phi2, 0, 1);
-        #else
-         accumulator2+=0.0;
-        #endif
+	  equal_vecs(&phi1, &(GC->higgs[r]));
+	  r1=r;
+	  one(&U);
+	  for(i=0; i<dist; i++)
+	    {
+	      times_equal(&U, &(GC->lattice[r1][1]));
+	      r1=nnp(geo, r1, 1);
+	    }
+	  matrix_times_vector_all_vecs(&phi2, &U, &(GC->higgs[r1]));
+	  accumulator1+=re_scal_prod_vecs(&phi1, &phi2);
+#if NHIGGS >1
+	  accumulator2+=re_scal_prod_single_vecs(&phi1, &phi2, 0, 1);
+#else
+	  accumulator2+=0.0;
+#endif
         }
-     accumulator1*=param->d_inv_vol;
-     accumulator2*=param->d_inv_vol;
+      accumulator1*=param->d_inv_vol;
+      accumulator2*=param->d_inv_vol;
 
-     corr0string0[dist]=accumulator1;
-     corr0string1[dist]=accumulator2;
-     }
-  }
+      corr0string0[dist]=accumulator1;
+      corr0string1[dist]=accumulator2;
+    }
+}
 
 
 void perform_measures_higgs(Gauge_Conf *GC,
                             Geometry const * const geo,
                             GParam const * const param,
                             FILE *datafilep)
-   {
-   double plaqs, plaqt, polyre, polyim, he, tildeG0, tildeGminp, tildeD0, tildeDminp;
-   long r;
+{
+  double plaqs, plaqt, polyre, polyim, he, tildeG0, tildeGminp, tildeD0, tildeDminp;
+  long r;
 
-   plaquette(GC, geo, param, &plaqs, &plaqt);
-   polyakov(GC, geo, param, &polyre, &polyim);
-   higgs_interaction(GC, geo, param, &he);
+  plaquette(GC, geo, param, &plaqs, &plaqt);
+  polyakov(GC, geo, param, &polyre, &polyim);
+  higgs_interaction(GC, geo, param, &he);
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r)
-   #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r)
+#endif
+  for(r=0; r<(param->d_volume); r++)
+    {
       init_FMatrix_vecs(&(GC->Qh[r]), &(GC->higgs[r]));
       GC->Dh[r] = HiggsU1Obs_vecs(&(GC->higgs[r]));
-      }
+    }
 
-   compute_flavour_observables(GC,
-                               param,
-                               &tildeG0,
-                               &tildeGminp,
-                               &tildeD0,
-                               &tildeDminp);
+  compute_flavour_observables(GC,
+			      param,
+			      &tildeG0,
+			      &tildeGminp,
+			      &tildeD0,
+			      &tildeDminp);
 
-   fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
-   fprintf(datafilep, "%.12g %.12g ", polyre, polyim);
-   fprintf(datafilep, "%.12g ", he);
-   fprintf(datafilep, "%.12g %.12g ", tildeG0, tildeGminp);
-   fprintf(datafilep, "%.12g %.12g ", tildeD0, tildeDminp);
+  fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+  fprintf(datafilep, "%.12g %.12g ", polyre, polyim);
+  fprintf(datafilep, "%.12g ", he);
+  fprintf(datafilep, "%.12g %.12g ", tildeG0, tildeGminp);
+  fprintf(datafilep, "%.12g %.12g ", tildeD0, tildeDminp);
 
-   /*
-   // for correlators
+  /*
+  // for correlators
 
-   int err, i;
-   double *corrQQ, *corr0string0, *corr0string1;
-   err=posix_memalign((void**) &(corrQQ), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
-   err+=posix_memalign((void**) &(corr0string0), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
-   err+=posix_memalign((void**) &(corr0string1), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
-   if(err!=0)
-     {
-     fprintf(stderr, "Problems in allocating the correlators! (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
+  int err, i;
+  double *corrQQ, *corr0string0, *corr0string1;
+  err=posix_memalign((void**) &(corrQQ), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
+  err+=posix_memalign((void**) &(corr0string0), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
+  err+=posix_memalign((void**) &(corr0string1), (size_t) DOUBLE_ALIGN, (size_t) param->d_size[1] * sizeof(double));
+  if(err!=0)
+  {
+  fprintf(stderr, "Problems in allocating the correlators! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+  }
 
-   compute_flavour_observables_corr(GC,
-                                    geo,
-                                    param,
-                                    corrQQ,
-                                    corr0string0,
-                                    corr0string1);
-   for(i=0; i<param->d_size[1]; i++)
-      {
-      fprintf(datafilep, "%.12g ", corrQQ[i]);
-      }
-   for(i=0; i<param->d_size[1]; i++)
-      {
-      fprintf(datafilep, "%.12g ", corr0string0[i]);
-      }
-    for(i=0; i<param->d_size[1]; i++)
-      {
-      fprintf(datafilep, "%.12g ", corr0string1[i]);
-      }
+  compute_flavour_observables_corr(GC,
+  geo,
+  param,
+  corrQQ,
+  corr0string0,
+  corr0string1);
+  for(i=0; i<param->d_size[1]; i++)
+  {
+  fprintf(datafilep, "%.12g ", corrQQ[i]);
+  }
+  for(i=0; i<param->d_size[1]; i++)
+  {
+  fprintf(datafilep, "%.12g ", corr0string0[i]);
+  }
+  for(i=0; i<param->d_size[1]; i++)
+  {
+  fprintf(datafilep, "%.12g ", corr0string1[i]);
+  }
 
-   free(corrQQ);
-   free(corr0string0);
-   free(corr0string1);
-   */
+  free(corrQQ);
+  free(corr0string0);
+  free(corr0string1);
+  */
 
-   fprintf(datafilep, "\n");
+  fprintf(datafilep, "\n");
 
-   fflush(datafilep);
-   }
+  fflush(datafilep);
+}
 
 
 // this is a function to be used just to test some fine points
@@ -1356,57 +1359,57 @@ void perform_measures_higgs_for_testing(Gauge_Conf *GC,
                                         Geometry const * const geo,
                                         GParam const * const param,
                                         FILE *datafilep)
-   {
-   double plaqs, plaqt, polyre, polyim, he, p2, tildeG0, tildeGminp, tildeD0, tildeDminp;
-   long r;
+{
+  double plaqs, plaqt, polyre, polyim, he, p2, tildeG0, tildeGminp, tildeD0, tildeDminp;
+  long r;
 
-   plaquette(GC, geo, param, &plaqs, &plaqt);
-   polyakov(GC, geo, param, &polyre, &polyim);
-   higgs_interaction(GC, geo, param, &he);
+  plaquette(GC, geo, param, &plaqs, &plaqt);
+  polyakov(GC, geo, param, &polyre, &polyim);
+  higgs_interaction(GC, geo, param, &he);
 
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r)
-   #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r)
+#endif
+  for(r=0; r<(param->d_volume); r++)
+    {
       init_FMatrix_vecs(&(GC->Qh[r]), &(GC->higgs[r]));
       GC->Dh[r] = HiggsU1Obs_vecs(&(GC->higgs[r]));
-      }
+    }
 
-   fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
-   fprintf(datafilep, "%.12g %.12g ", polyre, polyim);
-   fprintf(datafilep, "%.12g ", he);
+  fprintf(datafilep, "%.12g %.12g ", plaqs, plaqt);
+  fprintf(datafilep, "%.12g %.12g ", polyre, polyim);
+  fprintf(datafilep, "%.12g ", he);
 
-   compute_flavour_observables(GC,
-                               param,
-                               &tildeG0,
-                               &tildeGminp,
-                               &tildeD0,
-                               &tildeDminp);
+  compute_flavour_observables(GC,
+			      param,
+			      &tildeG0,
+			      &tildeGminp,
+			      &tildeD0,
+			      &tildeDminp);
 
-   fprintf(datafilep, "%.12g %.12g ", tildeG0, tildeGminp);
-   fprintf(datafilep, "%.12g %.12g ", tildeD0, tildeDminp);
+  fprintf(datafilep, "%.12g %.12g ", tildeG0, tildeGminp);
+  fprintf(datafilep, "%.12g %.12g ", tildeD0, tildeDminp);
 
-   p2=0.0;
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+: p2)
-   #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
+  p2=0.0;
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r) reduction(+: p2)
+#endif
+  for(r=0; r<(param->d_volume); r++)
+    {
       FMatrix tmp1, tmp2;
       equal_FMatrix(&tmp1, &(GC->Qh[r]));
       equal_FMatrix(&tmp2, &tmp1);
       times_equal_FMatrix(&tmp1, &tmp2);
       p2+=retr_FMatrix(&tmp1)*NHIGGS+1./NHIGGS;
-      }
-   p2*=param->d_inv_vol;
+    }
+  p2*=param->d_inv_vol;
 
-   fprintf(datafilep, "%.12g ", p2);
+  fprintf(datafilep, "%.12g ", p2);
 
-   fprintf(datafilep, "\n");
+  fprintf(datafilep, "\n");
 
-   fflush(datafilep);
-   }
+  fflush(datafilep);
+}
 
 
 
@@ -1416,133 +1419,133 @@ void perform_measures_higgs_for_testing(Gauge_Conf *GC,
 void max_abelian_gauge_fix(Gauge_Conf *GC,
                            Geometry const * const geo,
                            GParam const * const param)
-   {
-   int i, dir;
-   long r;
-   double lambda[NCOLOR];
-   const double overrelaxparam=1.85; // 1.0 means no overrelaxation
-   const double target=1.0e-8;
-   double nondiag, nondiagaux;
+{
+  int i, dir;
+  long r;
+  double lambda[NCOLOR];
+  const double overrelaxparam=1.85; // 1.0 means no overrelaxation
+  const double target=1.0e-8;
+  double nondiag, nondiagaux;
 
-   // inizialize the matrix lambda = diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
-   for(i=0; i<NCOLOR; i++)
-      {
+  // inizialize the matrix lambda = diag((N-1)/2, (N-1)/2-1, ..., -(N-1)/2)
+  for(i=0; i<NCOLOR; i++)
+    {
       lambda[i] = ( (double) NCOLOR -1.)/2. - (double) i;
-      }
+    }
 
-   nondiag=1;
-   while(nondiag > target)
-        {
-        #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
-        #endif
-        for(r=0; r<param->d_volume/2; r++)
-           {
-           GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
+  nondiag=1;
+  while(nondiag > target)
+    {
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+#endif
+      for(r=0; r<param->d_volume/2; r++)
+	{
+	  GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
 
-           // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
-           // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
-           for(dir=0; dir<STDIM; dir++)
-              {
+	  // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
+	  // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
+	  for(dir=0; dir<STDIM; dir++)
+	    {
               equal(&(X_links[dir]), &(GC->lattice[r][dir]));
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
-              }
+	    }
 
-           comp_MAG_gauge_transformation(X_links, lambda, overrelaxparam, &G_mag);
+	  comp_MAG_gauge_transformation(X_links, lambda, overrelaxparam, &G_mag);
  
-           // apply the gauge transformation
-           for(dir=0; dir<STDIM; dir++)
-              {
+	  // apply the gauge transformation
+	  for(dir=0; dir<STDIM; dir++)
+	    {
               times(&help, &G_mag, &(GC->lattice[r][dir]));
               equal(&(GC->lattice[r][dir]), &help);
 
               times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);
-              }
-           }
+	    }
+	}
 
-        #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
-        #endif
-        for(r=param->d_volume/2; r<param->d_volume; r++)
-           {
-           GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+#endif
+      for(r=param->d_volume/2; r<param->d_volume; r++)
+	{
+	  GAUGE_GROUP G_mag, help, X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
 
-           // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
-           // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
-           for(dir=0; dir<STDIM; dir++)
-              {
+	  // initialize X_links[2*STDIM] with the 2*STDIM links surrounding the point r
+	  // links 0 to (STDIM-1) are forward, while links STDIM to (2*STDIM-1) are backwards.
+	  for(dir=0; dir<STDIM; dir++)
+	    {
               equal(&(X_links[dir]), &(GC->lattice[r][dir]));
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
-              }
+	    }
 
-           comp_MAG_gauge_transformation(X_links, lambda, overrelaxparam, &G_mag);
+	  comp_MAG_gauge_transformation(X_links, lambda, overrelaxparam, &G_mag);
 
-           // apply the gauge transformation
-           for(dir=0; dir<STDIM; dir++)
-              {
+	  // apply the gauge transformation
+	  for(dir=0; dir<STDIM; dir++)
+	    {
               times(&help, &G_mag, &(GC->lattice[r][dir]));
               equal(&(GC->lattice[r][dir]), &help);
 
               times_equal_dag(&(GC->lattice[nnm(geo, r, dir)][dir]), &G_mag);
-              }
-           }
+	    }
+	}
 
-        // nondiagaux is the sum of the squares of the out-diagonal terms
-        nondiagaux=0;
+      // nondiagaux is the sum of the squares of the out-diagonal terms
+      nondiagaux=0;
 
-        #ifdef OPENMP_MODE
-        #pragma omp parallel for num_threads(NTHREADS) private(r, dir)  reduction(+ : nondiagaux)
-        #endif
-        for(r=0; r<param->d_volume; r++)
-           {
-           GAUGE_GROUP X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
-           double counter;
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r, dir)  reduction(+ : nondiagaux)
+#endif
+      for(r=0; r<param->d_volume; r++)
+	{
+	  GAUGE_GROUP X_links[2*STDIM];   // X_links contains the 2*STDIM links used in the computation of X(n)
+	  double counter;
 
-           for(dir=0; dir<STDIM; dir++)
-              {
+	  for(dir=0; dir<STDIM; dir++)
+	    {
               equal(&(X_links[dir]), &(GC->lattice[r][dir]));
               equal(&(X_links[dir+STDIM]), &(GC->lattice[nnm(geo, r, dir)][dir]));
-              }
-           comp_outdiagnorm_of_X(X_links, lambda, &counter);
-           nondiagaux += counter;
-           }
+	    }
+	  comp_outdiagnorm_of_X(X_links, lambda, &counter);
+	  nondiagaux += counter;
+	}
      
-        nondiag = nondiagaux * param->d_inv_vol / (double)NCOLOR / (double) NCOLOR;
+      nondiag = nondiagaux * param->d_inv_vol / (double)NCOLOR / (double) NCOLOR;
 
-        // printf("%g  %g\n", nondiag, nondiag/target);
-        // fflush(stdout);
-        }
+      // printf("%g  %g\n", nondiag, nondiag/target);
+      // fflush(stdout);
+    }
 
-   // unitarize all the links
-   #ifdef OPENMP_MODE
-   #pragma omp parallel for num_threads(NTHREADS) private(r, dir)
-   #endif
-   for(r=0; r<(param->d_volume); r++)
-      {
+  // unitarize all the links
+#ifdef OPENMP_MODE
+#pragma omp parallel for num_threads(NTHREADS) private(r, dir)
+#endif
+  for(r=0; r<(param->d_volume); r++)
+    {
       for(dir=0; dir<STDIM; dir++)
-         {
-         unitarize(&(GC->lattice[r][dir]));
-         }
-      }
-   } 
+	{
+	  unitarize(&(GC->lattice[r][dir]));
+	}
+    }
+} 
 
 
 // extract the diagonal part of the links after gauge fixing.
 // the phases are saved in GC->diag_proj but these are NOT the monopole phases (see U1_extract)
 void diag_projection(Gauge_Conf *GC,
                      GParam const * const param)
-   {
-   int dir; 
-   long r;
+{
+  int dir; 
+  long r;
 
-   for(r=0;r<param->d_volume;r++)
-      {
+  for(r=0;r<param->d_volume;r++)
+    {
       for(dir=0;dir<STDIM;dir++)
-         {
-         diag_projection_single_site(GC, &(GC->lattice[r][dir]), r, dir);
-         }
-      }
-   }
+	{
+	  diag_projection_single_site(GC, &(GC->lattice[r][dir]), r, dir);
+	}
+    }
+}
 
 
 // extract the abelian components of the link
@@ -1554,24 +1557,24 @@ void diag_projection(Gauge_Conf *GC,
 void U1_extract(Gauge_Conf *GC, 
                 GParam const * const param,
                 int subg)
-   { 
-   int dir, i;
-   long r;    
+{ 
+  int dir, i;
+  long r;    
 
-   for(r=0;r<param->d_volume;r++)
-      {
+  for(r=0;r<param->d_volume;r++)
+    {
       for(dir=0;dir<STDIM;dir++)
-         {
-         GC->u1_subg[r][dir] = 0.0;
-         for(i=0;i<=subg;i++)
+	{
+	  GC->u1_subg[r][dir] = 0.0;
+	  for(i=0;i<=subg;i++)
             {
-            GC->u1_subg[r][dir] += GC->diag_proj[r][dir][i];
+	      GC->u1_subg[r][dir] += GC->diag_proj[r][dir][i];
             }
 
-         GC->uflag[r][dir] = 0;
-         }
-      }
-   }
+	  GC->uflag[r][dir] = 0;
+	}
+    }
+}
 
 
 // Compute the forward derivative of the abelian part of the plaquette Fjk in direction i.
@@ -1584,42 +1587,42 @@ void Di_Fjk(Gauge_Conf *GC,
             int kdir,
             double *DiFjk)
 
-   {
-   double prpi, pr; // pr -> plaquette at site r, prpi plaquette at site r+idir
+{
+  double prpi, pr; // pr -> plaquette at site r, prpi plaquette at site r+idir
 
-//
-//       ^ k
-//       |
-//       +---<---+
-//       |       |
-//       V       ^         pr
-//       |       |
-//       +--->---+---> j
-//       r
-//
+  //
+  //       ^ k
+  //       |
+  //       +---<---+
+  //       |       |
+  //       V       ^         pr
+  //       |       |
+  //       +--->---+---> j
+  //       r
+  //
 
-   pr  = GC->u1_subg[r][jdir] - GC->u1_subg[r][kdir];
-   pr += GC->u1_subg[nnp(geo, r, jdir)][kdir] - GC->u1_subg[nnp(geo, r, kdir)][jdir];
+  pr  = GC->u1_subg[r][jdir] - GC->u1_subg[r][kdir];
+  pr += GC->u1_subg[nnp(geo, r, jdir)][kdir] - GC->u1_subg[nnp(geo, r, kdir)][jdir];
 
 
-//
-//       ^ k
-//       |   (2)
-//       +---<---+
-//       |       |
-//   (3) V       ^ (1)        prpi
-//       |       |
-//       +--->---+---> j
-//      r+i    (4)
-//
+  //
+  //       ^ k
+  //       |   (2)
+  //       +---<---+
+  //       |       |
+  //   (3) V       ^ (1)        prpi
+  //       |       |
+  //       +--->---+---> j
+  //      r+i    (4)
+  //
 
-   r=nnp(geo, r, idir);
+  r=nnp(geo, r, idir);
 
-   prpi  = GC->u1_subg[r][jdir] - GC->u1_subg[r][kdir];
-   prpi += GC->u1_subg[nnp(geo, r, jdir)][kdir] - GC->u1_subg[nnp(geo, r, kdir)][jdir];
+  prpi  = GC->u1_subg[r][jdir] - GC->u1_subg[r][kdir];
+  prpi += GC->u1_subg[nnp(geo, r, jdir)][kdir] - GC->u1_subg[nnp(geo, r, kdir)][jdir];
  
-   *DiFjk = 2.0*(atan(tan(prpi/2.0)) - atan(tan(pr/2.0)));
-   }
+  *DiFjk = 2.0*(atan(tan(prpi/2.0)) - atan(tan(pr/2.0)));
+}
 
 
 // compute the DeGrand-DeTar currents
@@ -1627,51 +1630,51 @@ int DeGrand_current(Gauge_Conf *GC,
                     Geometry const * const geo,
                     long r,
                     int dir)
-   {
-   if(STDIM!=4)
-     {
-     fprintf(stderr, "Wrong number of dimensions! (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-     }
+{
+  if(STDIM!=4)
+    {
+      fprintf(stderr, "Wrong number of dimensions! (%s, %d)\n", __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    }
 
-   double der1, der2, der3;
-   int ris;
+  double der1, der2, der3;
+  int ris;
 
-   if(dir == 0)
-     {
-     Di_Fjk(GC, geo, r, 1, 2, 3, &der1);
-     Di_Fjk(GC, geo, r, 3, 1, 2, &der2);
-     Di_Fjk(GC, geo, r, 2, 1, 3, &der3);
+  if(dir == 0)
+    {
+      Di_Fjk(GC, geo, r, 1, 2, 3, &der1);
+      Di_Fjk(GC, geo, r, 3, 1, 2, &der2);
+      Di_Fjk(GC, geo, r, 2, 1, 3, &der3);
    
-     ris = (int) round( ((der1 + der2 - der3)/PI2) );
-     }
-   else if(dir ==1)
-          {
-          Di_Fjk(GC, geo, r, 3, 2, 0, &der1);
-          Di_Fjk(GC, geo, r, 0, 3, 2, &der2);
-          Di_Fjk(GC, geo, r, 2, 3, 0, &der3);
+      ris = (int) round( ((der1 + der2 - der3)/PI2) );
+    }
+  else if(dir ==1)
+    {
+      Di_Fjk(GC, geo, r, 3, 2, 0, &der1);
+      Di_Fjk(GC, geo, r, 0, 3, 2, &der2);
+      Di_Fjk(GC, geo, r, 2, 3, 0, &der3);
 
-          ris = (int) round( ((der1 + der2 - der3)/PI2) );
-          }
-   else if(dir == 2)
-          {
-          Di_Fjk(GC, geo, r, 3, 0, 1, &der1);
-          Di_Fjk(GC, geo, r, 0, 1, 3, &der2);
-          Di_Fjk(GC, geo, r, 1, 0, 3, &der3);
+      ris = (int) round( ((der1 + der2 - der3)/PI2) );
+    }
+  else if(dir == 2)
+    {
+      Di_Fjk(GC, geo, r, 3, 0, 1, &der1);
+      Di_Fjk(GC, geo, r, 0, 1, 3, &der2);
+      Di_Fjk(GC, geo, r, 1, 0, 3, &der3);
 
-          ris = (int) round( ((der1 + der2 - der3)/PI2) );
-          }
-   else
-     {
-     Di_Fjk(GC, geo, r, 0,2,1, &der1);
-     Di_Fjk(GC, geo, r, 2,1,0, &der2);
-     Di_Fjk(GC, geo, r, 1,2,0, &der3);
+      ris = (int) round( ((der1 + der2 - der3)/PI2) );
+    }
+  else
+    {
+      Di_Fjk(GC, geo, r, 0,2,1, &der1);
+      Di_Fjk(GC, geo, r, 2,1,0, &der2);
+      Di_Fjk(GC, geo, r, 1,2,0, &der3);
 
-     ris = (int) round( ((der1 + der2 - der3)/PI2) );
-     }
+      ris = (int) round( ((der1 + der2 - der3)/PI2) );
+    }
 
-   return ris;
-   } 
+  return ris;
+} 
 
 
 // search for monopole wrappings passing from r_tback
@@ -1690,63 +1693,94 @@ void wrap_search(Gauge_Conf *GC,
                  GParam const * const param,
                  long r,
                  long r_tback,
-                 int *num_wrap)
-   {
-   #if STDIM!=4
-     fprintf(stderr, "Wrong number of dimensions! (%s, %d)\n", __FILE__, __LINE__);
-     exit(EXIT_FAILURE);
-   #endif
+                 int *num_wrap,
+		 int subg,
+                 FILE *coords,
+		 size_t *postype)
+{
+#if STDIM!=4
+  fprintf(stderr, "Wrong number of dimensions! (%s, %d)\n", __FILE__, __LINE__);
+  exit(EXIT_FAILURE);
+#endif
 
-   int dir, n_mu;
-
-   if(r == r_tback)
-     {
-     return;
-     }
-   else
-     {
-     // forward case
-     for(dir=0; dir<STDIM; dir++)
+  int dir, n_mu;
+  size_t postype_size;
+  
+  if(r == r_tback)
+    {
+      if(*num_wrap!=0){
+	postype_size=size_t_array_length(postype);
+	for(size_t i = 1; i <= postype_size; i+=5)
+	  fprintf(coords,"%zu %zu %zu %zu %d %zu\n",
+		  postype[i],postype[i+1],postype[i+2],postype[i+3],subg,postype[i+4]);
+      }
+      return;
+    }
+  else
+    {
+      // forward case
+      for(dir=0; dir<STDIM; dir++)
         {
-        n_mu=DeGrand_current(GC, geo, nnp(geo, r, dir), dir);
+	  n_mu=DeGrand_current(GC, geo, nnp(geo, r, dir), dir);
 
-        // if not all the monopole currents have been followed
-        if(n_mu > GC->uflag[r][dir])
-          {
-          GC->uflag[r][dir] += 1;
+	  // if not all the monopole currents have been followed
+	  if(n_mu > GC->uflag[r][dir])
+	    {
+	      GC->uflag[r][dir] += 1;
 
-          if( (geo->d_timeslice[r] == param->d_size[0]-1) && (dir == 0) )
-            {
-            *num_wrap += 1;
-            }
+	      if( (geo->d_timeslice[r] == param->d_size[0]-1) && (dir == 0) )
+		{
+		  *num_wrap += 1;
+		}
 
-          wrap_search(GC, geo, param, nnp(geo, r, dir), r_tback, num_wrap);
+	      if( geo->d_timeslice[r] == 0 )
+		{
+		  postype_size=size_t_array_length(postype);
+		  my_realloc(&postype,sizeof(size_t)*(postype_size+5));
+		  int tmp[4];
+		  lexeo_to_cart(tmp, r, param);
+		  for(size_t i=1; i<=4;i++)
+		    postype[postype_size+i]=(size_t)tmp[i-1];
+		  postype[postype_size+5]=0;
+		}
 
-          return;
-          }
+	      wrap_search(GC, geo, param, nnp(geo, r, dir), r_tback, num_wrap, subg ,coords, postype);
+
+	      return;
+	    }
         }
 
-     //backward case
-     for(dir=0;dir<STDIM;dir++)
+      //backward case
+      for(dir=0;dir<STDIM;dir++)
         {
-        n_mu=DeGrand_current(GC, geo, r, dir);
+	  n_mu=DeGrand_current(GC, geo, r, dir);
 
-        if(n_mu < GC->uflag[nnm(geo, r, dir)][dir])
-          {
-          GC->uflag[nnm(geo, r, dir)][dir] -= 1;
+	  if(n_mu < GC->uflag[nnm(geo, r, dir)][dir])
+	    {
+	      GC->uflag[nnm(geo, r, dir)][dir] -= 1;
 
-          if( (geo->d_timeslice[r] == 0) && (dir == 0) )
-            {
-            *num_wrap -= 1;
-            }
+	      if( (geo->d_timeslice[r] == 0) && (dir == 0) )
+		{
+		  *num_wrap -= 1;
+		}
+	      if( geo->d_timeslice[r] == 0 )
+		{
+		  postype_size=size_t_array_length(postype);
+		  my_realloc(&postype,sizeof(size_t)*(postype_size+5));
+		  int tmp[4];
+		  lexeo_to_cart(tmp, r, param);
+		  for(size_t i=1; i<=4;i++)
+		    postype[postype_size+i]=(size_t)tmp[i-1];
+		  postype[postype_size+5]=1;
+		}
 
-          wrap_search(GC, geo, param, nnm(geo, r, dir), r_tback, num_wrap);
+	      wrap_search(GC, geo, param, nnm(geo, r, dir), r_tback, num_wrap, subg,coords, postype);
 
-          return;
-          }
+	      return;
+	    }
         }
-     }
-   }
+    }
+}
 
 // GC->uflag[][] will be used to store the monopole current at a given point
 // (when GC->uflag is allocated it is also initialized to zero)
@@ -1755,58 +1789,58 @@ void monopoles_clusters(Gauge_Conf *GC,
                         GParam const * const param,
                         int subg,
                         FILE* mono_cluster_filep)
-   {
-   long r, lenght, r_start, r_current;
-   int cartcoord[4];
-   int dir, dir_neg;
+{
+  long r, lenght, r_start, r_current;
+  int cartcoord[4];
+  int dir, dir_neg;
 
-   // initialize to zero GC->abs_current
-   for(r=0; r<param->d_volume; r++)
-      {
+  // initialize to zero GC->abs_current
+  for(r=0; r<param->d_volume; r++)
+    {
       GC->abs_currents[r] = 0.0;
-      }
+    }
 
-   // now compute the DeGrant current in every site and direction. 
-   for(r=0; r<param->d_volume; r++)
-      {
+  // now compute the DeGrant current in every site and direction. 
+  for(r=0; r<param->d_volume; r++)
+    {
       for(dir=0; dir<STDIM; dir++)
-         {
-         // the current at site r and direction dir is saved in the r-dir, dir position of GC->currents.
-         // this is done to preserve the dual lattice. Ipse dixit MDE
-         GC->currents[nnm(geo, r, dir)][dir] = DeGrand_current(GC, geo, r, dir);
-         }
-      }
+	{
+	  // the current at site r and direction dir is saved in the r-dir, dir position of GC->currents.
+	  // this is done to preserve the dual lattice. Ipse dixit MDE
+	  GC->currents[nnm(geo, r, dir)][dir] = DeGrand_current(GC, geo, r, dir);
+	}
+    }
 
-   // now populate GC->all_currents and GC->abs_currents
-   // dir 0-3 are the same, 4-8 are the opposite directions
-   for(r=0; r<param->d_volume; r++)
-      {
+  // now populate GC->all_currents and GC->abs_currents
+  // dir 0-3 are the same, 4-8 are the opposite directions
+  for(r=0; r<param->d_volume; r++)
+    {
       for(dir=0; dir<STDIM; dir++)
-         {
-         dir_neg = 2*STDIM - dir - 1;
-         GC->all_currents[r][dir] = GC->currents[r][dir];
-         GC->all_currents[r][dir_neg] = -GC->currents[nnm(geo, r, dir)][dir];
-         GC->abs_currents[r] += (fabs(GC->currents[r][dir]) + fabs(GC->currents[nnm(geo, r, dir)][dir]));
-         }
-         //lexeo_to_cart(cartcoord, r, p aram);
-         //fprintf(mono_cluster_filep, "%d %d %d %d %lf\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3],  GC->abs_currents[r]);
-      }
+	{
+	  dir_neg = 2*STDIM - dir - 1;
+	  GC->all_currents[r][dir] = GC->currents[r][dir];
+	  GC->all_currents[r][dir_neg] = -GC->currents[nnm(geo, r, dir)][dir];
+	  GC->abs_currents[r] += (fabs(GC->currents[r][dir]) + fabs(GC->currents[nnm(geo, r, dir)][dir]));
+	}
+      //lexeo_to_cart(cartcoord, r, p aram);
+      //fprintf(mono_cluster_filep, "%d %d %d %d %lf\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3],  GC->abs_currents[r]);
+    }
 
-   // cycle over the volume keeping track of the starting point r_start.
-   for(r_start=0; r_start<param->d_volume; r_start++)
-      {
+  // cycle over the volume keeping track of the starting point r_start.
+  for(r_start=0; r_start<param->d_volume; r_start++)
+    {
       lenght = 0.0;
       fflush(stdout);
       if(GC->abs_currents[r_start] > 0)
-         {
-         r_current = r_start;
-         compute_cluster(GC, geo, param, r_current, r_start, &lenght);
-         lexeo_to_cart(cartcoord, r_current, param);
-         fprintf(mono_cluster_filep, "%d %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], subg, lenght);
-         }
-      }
+	{
+	  r_current = r_start;
+	  compute_cluster(GC, geo, param, r_current, r_start, &lenght);
+	  lexeo_to_cart(cartcoord, r_current, param);
+	  fprintf(mono_cluster_filep, "%d %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], subg, lenght);
+	}
+    }
 
-   }
+}
 
 void compute_cluster(Gauge_Conf *GC,
                      Geometry const * const geo,
@@ -1814,103 +1848,102 @@ void compute_cluster(Gauge_Conf *GC,
                      long r_current,
                      long r_start,
                      long * lenght)
-   {
-   int find_flag=0;
-   int i, dir, dir_neg;
-   long r_new, r_aux;
-
-   r_aux = r_start;
-   // search currents in all the possible direction from r_start
-   for(i=0;i<2*STDIM;i++)
-      {
+{
+  int find_flag=0;
+  int i, dir, dir_neg;
+  long r_new;
+   
+  // search currents in all the possible direction from r_start
+  for(i=0;i<2*STDIM;i++)
+    {
       //printf("--------------------------> %ld\n", r_current);
       if(GC->all_currents[r_current][i] > 0)
-         {
-         dir = i;
-         find_flag = 1;
+	{
+	  dir = i;
+	  find_flag = 1;
 
-         *lenght += 1;
+	  *lenght += 1;
 
-         //printf("DIREZIONE TROVATA %d\n", i);
-         //fflush(stdout);
-         dir_neg = 2*STDIM - dir - 1;
-        // printf("DIREZIONE NEGATIVA %d\n", dir_neg);
-         //fflush(stdout);
-         if(dir<4)
+	  //printf("DIREZIONE TROVATA %d\n", i);
+	  //fflush(stdout);
+	  dir_neg = 2*STDIM - dir - 1;
+	  // printf("DIREZIONE NEGATIVA %d\n", dir_neg);
+	  //fflush(stdout);
+	  if(dir<4)
             {
-            //lexeo_to_cart(cartcoord, r_current, param);
-            //printf("OLD POINT %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_current);
-            //printf("OLD POINT CURR %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_aux][0], GC->all_currents[r_aux][1], GC->all_currents[r_aux][2], GC->all_currents[r_aux][3], GC->all_currents[r_aux][4], GC->all_currents[r_aux][5], GC->all_currents[r_aux][6], GC->all_currents[r_aux][7]);
-            //fflush(stdout);
+	      //lexeo_to_cart(cartcoord, r_current, param);
+	      //printf("OLD POINT %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_current);
+	      //printf("OLD POINT CURR %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_aux][0], GC->all_currents[r_aux][1], GC->all_currents[r_aux][2], GC->all_currents[r_aux][3], GC->all_currents[r_aux][4], GC->all_currents[r_aux][5], GC->all_currents[r_aux][6], GC->all_currents[r_aux][7]);
+	      //fflush(stdout);
 
-            r_new = nnp(geo, r_current, dir);
+	      r_new = nnp(geo, r_current, dir);
 
-            //lexeo_to_cart(cartcoord, r_new, param);
-            //printf("NEW POINT  %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_new);
-            //fflush(stdout);
+	      //lexeo_to_cart(cartcoord, r_new, param);
+	      //printf("NEW POINT  %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_new);
+	      //fflush(stdout);
             }
-         else
+	  else
             {
-            //lexeo_to_cart(cartcoord, r_current, param);
-            //printf("OLD POINT %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_current);
-            //printf("OLD POINT CURR %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_aux][0], GC->all_currents[r_aux][1], GC->all_currents[r_aux][2], GC->all_currents[r_aux][3], GC->all_currents[r_aux][4], GC->all_currents[r_aux][5], GC->all_currents[r_aux][6], GC->all_currents[r_aux][7]);
-            //fflush(stdout);
+	      //lexeo_to_cart(cartcoord, r_current, param);
+	      //printf("OLD POINT %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_current);
+	      //printf("OLD POINT CURR %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_aux][0], GC->all_currents[r_aux][1], GC->all_currents[r_aux][2], GC->all_currents[r_aux][3], GC->all_currents[r_aux][4], GC->all_currents[r_aux][5], GC->all_currents[r_aux][6], GC->all_currents[r_aux][7]);
+	      //fflush(stdout);
 
-            r_new = nnm(geo, r_current, dir_neg);
+	      r_new = nnm(geo, r_current, dir_neg);
 
-            //lexeo_to_cart(cartcoord, r_new, param);
-            //printf("NEW POINT %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_new);
-            //fflush(stdout);
+	      //lexeo_to_cart(cartcoord, r_new, param);
+	      //printf("NEW POINT %d %d %d %d %ld\n", cartcoord[0], cartcoord[1], cartcoord[2], cartcoord[3], r_new);
+	      //fflush(stdout);
             }
          
 
-         GC->all_currents[r_current][dir] -= 1.0;
+	  GC->all_currents[r_current][dir] -= 1.0;
 
-         //printf("OLD POINT CURR AGG %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_aux][0], GC->all_currents[r_aux][1], GC->all_currents[r_aux][2], GC->all_currents[r_aux][3], GC->all_currents[r_aux][4], GC->all_currents[r_aux][5], GC->all_currents[r_aux][6], GC->all_currents[r_aux][7]);
-         //fflush(stdout);
+	  //printf("OLD POINT CURR AGG %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_aux][0], GC->all_currents[r_aux][1], GC->all_currents[r_aux][2], GC->all_currents[r_aux][3], GC->all_currents[r_aux][4], GC->all_currents[r_aux][5], GC->all_currents[r_aux][6], GC->all_currents[r_aux][7]);
+	  //fflush(stdout);
 
-         GC->abs_currents[r_current] -= 1.0;
+	  GC->abs_currents[r_current] -= 1.0;
 
-         //printf("NEW POINT CURR  %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_new][0], GC->all_currents[r_new][1], GC->all_currents[r_new][2], GC->all_currents[r_new][3], GC->all_currents[r_new][4], GC->all_currents[r_new][5], GC->all_currents[r_new][6], GC->all_currents[r_new][7]);
+	  //printf("NEW POINT CURR  %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_new][0], GC->all_currents[r_new][1], GC->all_currents[r_new][2], GC->all_currents[r_new][3], GC->all_currents[r_new][4], GC->all_currents[r_new][5], GC->all_currents[r_new][6], GC->all_currents[r_new][7]);
         
-         GC->all_currents[r_new][dir_neg] += 1.0;
+	  GC->all_currents[r_new][dir_neg] += 1.0;
 
-         //printf("NEW POINT CURR AGG %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_new][0], GC->all_currents[r_new][1], GC->all_currents[r_new][2], GC->all_currents[r_new][3], GC->all_currents[r_new][4], GC->all_currents[r_new][5], GC->all_currents[r_new][6], GC->all_currents[r_new][7]);
-         //printf("OLD %lf\n", GC->abs_currents[r_new]);
-         //fflush(stdout);
+	  //printf("NEW POINT CURR AGG %lf %lf %lf %lf %lf %lf %lf %lf\n", GC->all_currents[r_new][0], GC->all_currents[r_new][1], GC->all_currents[r_new][2], GC->all_currents[r_new][3], GC->all_currents[r_new][4], GC->all_currents[r_new][5], GC->all_currents[r_new][6], GC->all_currents[r_new][7]);
+	  //printf("OLD %lf\n", GC->abs_currents[r_new]);
+	  //fflush(stdout);
 
-         GC->abs_currents[r_new] -= 1.0;
+	  GC->abs_currents[r_new] -= 1.0;
 
-         //printf("NEW %lf\n", GC->abs_currents[r_new]);
-         //fflush(stdout);
-         //printf("START AND NEW %ld %ld\n", r_current, r_new);
+	  //printf("NEW %lf\n", GC->abs_currents[r_new]);
+	  //fflush(stdout);
+	  //printf("START AND NEW %ld %ld\n", r_current, r_new);
 
-         if(GC->abs_currents[r_new]<1.0)
+	  if(GC->abs_currents[r_new]<1.0)
             {
-            if(r_new == r_start)
-               {
-               //printf("Partial Length = %ld\n", *lenght);
-               //fflush(stdout);
-               }
-            else
-               {
-               printf("ERROR: CURRENT LOOP DOES NOT CLOSE\n");
-               exit(1);
-               }
+	      if(r_new == r_start)
+		{
+		  //printf("Partial Length = %ld\n", *lenght);
+		  //fflush(stdout);
+		}
+	      else
+		{
+		  printf("ERROR: CURRENT LOOP DOES NOT CLOSE\n");
+		  exit(1);
+		}
             }
-         else
+	  else
             {
-            compute_cluster(GC, geo, param, r_new, r_start, lenght);
+	      compute_cluster(GC, geo, param, r_new, r_start, lenght);
             }
-         r_start = r_current;
-         }
-      }
-      if(find_flag == 0)
-         {
-         printf("ERROR! NO CURRENT IN CURRENT POINT\n");
-         exit(1);
-         }
-   }
+	  r_start = r_current;
+	}
+    }
+  if(find_flag == 0)
+    {
+      printf("ERROR! NO CURRENT IN CURRENT POINT\n");
+      exit(1);
+    }
+}
 
 // GC->uflag[][] has to be initialized to zero before calling this function
 // (when GC->uflag is allocated it is also initialized to zero)
@@ -1919,16 +1952,18 @@ void monopoles_obs(Gauge_Conf *GC,
                    GParam const * const param, 
                    int subg,
                    double mod_pol,
-                   FILE* monofilep)
-   {
-   double mean_wrap;
-   long r, rsp, r_tback, r_tbackback;
-   int n_mu, num_wrap, mono_charge;
-   int cartcoord[4];
-   mean_wrap = 0.0;     // mean value of monopole wraps for unit volume
+                   FILE* monofilep,
+		   FILE* coords)
+{
+  double mean_wrap;
+  long r, rsp, r_tback, r_tbackback;
+  int n_mu, num_wrap, mono_charge;
+  int cartcoord[4];
+  size_t *postype;
+  mean_wrap = 0.0;     // mean value of monopole wraps for unit volume
 
-   for(rsp=0; rsp<param->d_space_vol; rsp++)
-      {
+  for(rsp=0; rsp<param->d_space_vol; rsp++)
+    {
       r = sisp_and_t_to_si(geo, rsp, 1);                             // t=1 slice
       r_tback = sisp_and_t_to_si(geo, rsp, 0);                       // t=0 slice
       r_tbackback = sisp_and_t_to_si(geo, rsp, param->d_size[0]-1);  // t=T-1 slice
@@ -1938,79 +1973,97 @@ void monopoles_obs(Gauge_Conf *GC,
 
       // start following monopole charge in forward direction. Maximum lattice charge is +2 so we try twice
       for(mono_charge = 0; mono_charge<2; mono_charge++)
-         {
-         // nonzero DeGrand_current(GC, geo, nnp(geo, r, dir), dir ) are associated to uflag[r][dir]
-         if(n_mu > GC->uflag[r_tback][0])
-           {
-           GC->uflag[r_tback][0] += 1;
+	{
+	  // nonzero DeGrand_current(GC, geo, nnp(geo, r, dir), dir ) are associated to uflag[r][dir]
+	  if(n_mu > GC->uflag[r_tback][0])
+	    {
+	      GC->uflag[r_tback][0] += 1;
+	      num_wrap = 0;
 
-           num_wrap = 0;
-           wrap_search(GC, geo, param, r, r_tback, &num_wrap);
+	      lexeo_to_cart(cartcoord, r_tback, param);
+	   
+	      my_malloc(&postype,5*sizeof(size_t));
+	      for(int i=1; i<=4;i++)
+		postype[i]=(size_t)cartcoord[i-1];
+	      postype[5]=0;
+	   
+	      wrap_search(GC, geo, param, r, r_tback, &num_wrap, subg, coords, postype);
+	   
+	      /* my_free(postype); */
+	      fflush(coords);
 
-           mean_wrap += abs(num_wrap);
+	      mean_wrap += abs(num_wrap);
 
-           lexeo_to_cart(cartcoord, r_tback, param);
-           if(n_mu == 1)
-             {
-             fprintf(monofilep, "%ld ", GC->update_index);
+	      if(n_mu == 1)
+		{
+		  fprintf(monofilep, "%ld ", GC->update_index);
 
-             for(int k = 0; k< 4; k++)
-                {
-                fprintf(monofilep, "%d ", cartcoord[k]);
-                }
-             fprintf(monofilep, "%.12g %d %d %d\n", mod_pol, subg, n_mu, num_wrap);
-             }
-           else if(GC->uflag[r_tback][0] == 1) // this is to print only once monopole of charge +2
-                  {
+		  for(int k = 0; k< 4; k++)
+		    {
+		      fprintf(monofilep, "%d ", cartcoord[k]);
+		    }
+		  fprintf(monofilep, "%.12g %d %d %d\n", mod_pol, subg, n_mu, num_wrap);
+		}
+	      else if(GC->uflag[r_tback][0] == 1) // this is to print only once monopole of charge +2
+		{
                   fprintf(monofilep, "%ld ", GC->update_index);
 
                   for(int k = 0; k<4; k++)
-                     {
-                     fprintf(monofilep, "%d ", cartcoord[k]);
-                     }
+		    {
+		      fprintf(monofilep, "%d ", cartcoord[k]);
+		    }
                   fprintf(monofilep, "%.12g %d %d %d\n", mod_pol, subg, n_mu, num_wrap);
-                  }
-           }
-         }
+		}
+	    }
+	}
 
       n_mu=DeGrand_current(GC, geo, r_tback, 0);
 
       // start following monopole charge in backward direction. Maximum lattice charge is +2 so we try twice
       for(mono_charge = 0; mono_charge<2; mono_charge++)
-         {
-         // nonzero DeGrand_current(GC, geo, nnp(geo, r, dir), dir ) are associated to uflag[r][dir]
-         if(n_mu < GC->uflag[r_tbackback][0])
-           {
-           GC->uflag[r_tbackback][0] -= 1;
+	{
+	  // nonzero DeGrand_current(GC, geo, nnp(geo, r, dir), dir ) are associated to uflag[r][dir]
+	  if(n_mu < GC->uflag[r_tbackback][0])
+	    {
+	      GC->uflag[r_tbackback][0] -= 1;
+	   
+	      num_wrap = -1; 
+	      lexeo_to_cart(cartcoord, r_tback, param);
+	   
+	      my_malloc(&postype,5*sizeof(size_t));
+	      for(int i=1; i<=4;i++)
+		postype[i]=(size_t)cartcoord[i-1];
+	      postype[5]=1;
+	   
+	      wrap_search(GC, geo, param, r_tbackback, r_tback, &num_wrap, subg, coords, postype); 
 
-           num_wrap = -1;
-           wrap_search(GC, geo, param, r_tbackback, r_tback, &num_wrap);
+	      /* my_free(postype); */
+	      fflush(coords);
+	   
+	      if(n_mu == -1)
+		{
+		  fprintf(monofilep, "%ld ", GC->update_index);
 
-           lexeo_to_cart(cartcoord, r_tback, param);
-           if(n_mu == -1)
-             {
-             fprintf(monofilep, "%ld ", GC->update_index);
-
-             for(int k = 0; k<4; k++)
-                {
-                fprintf(monofilep, "%d ", cartcoord[k]);
-                }
-             fprintf(monofilep, "%.12g %d %d %d\n", mod_pol, subg, n_mu, num_wrap);
-             }
-           else if(GC->uflag[r][0] == -1)  // this is to print only once monopole of charge +2
-                  {
+		  for(int k = 0; k<4; k++)
+		    {
+		      fprintf(monofilep, "%d ", cartcoord[k]);
+		    }
+		  fprintf(monofilep, "%.12g %d %d %d\n", mod_pol, subg, n_mu, num_wrap);
+		}
+	      else if(GC->uflag[r][0] == -1)  // this is to print only once monopole of charge +2
+		{
                   fprintf(monofilep, "%ld ", GC->update_index);
 
                   for(int k=0; k<4; k++)
-                     {
-                     fprintf(monofilep, "%d ", cartcoord[k]);
-                     }
+		    {
+		      fprintf(monofilep, "%d ", cartcoord[k]);
+		    }
                   fprintf(monofilep, "%.12g %d %d %d\n", mod_pol, subg, n_mu, num_wrap);
-                  }
-           }
-         }
-      }
-   }
+		}
+	    }
+	}
+    }
+}
 
 
 #endif
