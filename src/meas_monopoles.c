@@ -91,7 +91,7 @@ int main(int argc, char **argv)
    monofilep = fopen("mon.dat", "a");
    cluster_monofilep = fopen("mon_clusters.dat", "a");
    coords = fopen("coords.dat", "a");
-
+   fprintf(coords,"# conf %ld\n",GC.update_index);
    // compute the Polyakov observables
    double plaqs, plaqt, polyre[NCOLOR/2+1], polyim[NCOLOR/2+1], mod_loc, aux;
 

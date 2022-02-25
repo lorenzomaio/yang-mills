@@ -439,7 +439,7 @@ void polyakov_loc_fluct(Gauge_Conf const * const GC,
   mod=0.0;
 
 #ifdef OPENMP_MODE
-#pragma omp parallel for num_threads(NTHREADS) private(rsp) reduction(+ : rep) reduction(+ : imp) reduction(+ : rep_loc) reduction(+ : imp_loc)
+#pragma omp parallel for num_threads(NTHREADS) private(rsp) reduction(+ : rep) reduction(+ : imp)
 #endif
   for(rsp=0; rsp<param->d_space_vol; rsp++)
     {
